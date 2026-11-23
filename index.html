@@ -5,7 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Elara · Asisten AI Pribadi</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <style>
 :root{
   --bg:#0f1311; --side:#0b0e0c; --surface:#171c19; --ink:#e9eee9; --muted:#8d978f; --line:#252c27;
@@ -19,18 +21,16 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
-body{background:var(--bg);color:var(--ink);font:15px/1.65 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
-  height:100dvh;display:flex;overflow:hidden}
+body{background:var(--bg);color:var(--ink);font:15px/1.65 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif;height:100dvh;display:flex;overflow:hidden}
 button,textarea,input{font:inherit;color:inherit}
 button{cursor:pointer}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 textarea:focus-visible,input:focus-visible{outline:none}
 
-/* Sidebar */
 aside{width:288px;background:var(--side);border-right:1px solid var(--line);display:flex;flex-direction:column;flex:none;padding:calc(18px + env(safe-area-inset-top,0)) 14px 14px;transition:transform .25s}
-.av{width:30px;height:30px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-family:var(--serif);font-weight:600;font-size:15px;flex:none}
+.av{width:30px;height:30px;border-radius:50%;background:var(--avatar) center/cover no-repeat,var(--accent);color:transparent;overflow:hidden;display:block;font-size:0;flex:none;box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 55%,transparent)}
 .logo{display:flex;align-items:center;gap:10px;padding:2px 6px 18px}
-.logo .av{width:36px;height:36px;font-size:18px}
+.logo .av{width:40px;height:40px}
 .logo b{display:block;font-family:var(--serif);font-size:22px;font-weight:500;line-height:1.1}
 .logo small{display:block;font-size:12px;color:var(--muted)}
 .newbtn{width:100%;padding:11px 14px;border-radius:12px;border:none;background:var(--accent);color:var(--accent-ink);font-weight:600}
@@ -56,18 +56,16 @@ aside{width:288px;background:var(--side);border-right:1px solid var(--line);disp
 @media (hover:none){.item .acts-side{opacity:.85}}
 .none{color:var(--muted);font-size:13px;padding:14px 8px;line-height:1.55}
 
-/* Main */
-.pane{flex:1;display:flex;flex-direction:column;min-width:0}
+.pane{flex:1;display:flex;flex-direction:column;min-width:0;position:relative}
 header{display:flex;align-items:center;gap:10px;padding:calc(10px + env(safe-area-inset-top,0)) 16px 10px;border-bottom:1px solid var(--line)}
-header h2{font-size:14px;font-weight:600;margin-right:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted)}
-.ib{width:36px;height:36px;border-radius:9px;border:1px solid var(--line);background:none;display:grid;place-items:center}
+header h2{min-width:0;flex:1;font-size:14px;font-weight:600;margin-right:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted)}
+.ib{width:36px;height:36px;min-width:36px;flex:none;border-radius:9px;border:1px solid var(--line);background:none;display:grid;place-items:center;padding:0}
 .ib:hover{border-color:var(--accent);color:var(--accent)}
 .ib svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 #menu{display:none}
 main{flex:1;overflow-y:auto;position:relative}
-#log{max-width:740px;margin:0 auto;padding:28px 18px 16px;display:flex;flex-direction:column;gap:22px}
+#log{max-width:740px;margin:0 auto;padding:28px 18px calc(var(--fh,110px) + 24px);display:flex;flex-direction:column;gap:22px}
 
-/* User message */
 .u-wrap{align-self:flex-end;max-width:82%;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
 .u{background:var(--surface);border:1px solid var(--line);padding:10px 15px;border-radius:16px 16px 4px 16px;white-space:pre-wrap;overflow-wrap:anywhere;max-width:100%}
 .u-acts{display:flex;gap:6px;opacity:0;transition:opacity .15s;align-items:center}
@@ -76,7 +74,6 @@ main{flex:1;overflow-y:auto;position:relative}
 .u-acts button{background:none;border:1px solid var(--line);border-radius:6px;color:var(--muted);font-size:11px;padding:2px 8px}
 .u-acts button:hover{color:var(--accent);border-color:var(--accent)}
 
-/* Bot message */
 .b{display:flex;gap:12px}
 .body{min-width:0;flex:1}
 .who{font-size:13px;font-weight:600;margin:4px 0 2px}
@@ -86,62 +83,41 @@ main{flex:1;overflow-y:auto;position:relative}
 .prose ul,.prose ol{padding-left:22px}
 .prose li+li{margin-top:3px}
 .prose code{background:var(--surface);border:1px solid var(--line);padding:1px 6px;border-radius:5px;font:13px ui-monospace,Consolas,monospace}
+.prose a{color:var(--accent);text-decoration:underline;text-underline-offset:2px}
+.prose a:hover{filter:brightness(1.15)}
+.prose blockquote{border-left:3px solid var(--accent);background:var(--surface);padding:8px 14px;border-radius:0 8px 8px 0;color:var(--muted)}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+.tbl table{border-collapse:collapse;width:100%;font-size:14px}
+.tbl th,.tbl td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl th{background:var(--surface);font-weight:600;white-space:nowrap}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tbody tr:hover td{background:color-mix(in srgb,var(--surface) 60%,transparent)}
 .code{border-radius:10px;overflow:hidden;background:var(--code);color:#e9eee9;border:1px solid var(--line)}
 .cbar{display:flex;justify-content:space-between;align-items:center;padding:6px 12px;font-size:12px;color:#8d978f;border-bottom:1px solid #252c27}
 .cbar button{background:none;border:1px solid #2c342e;border-radius:6px;color:inherit;font-size:12px;padding:2px 9px}
 .cbar button:hover{color:#c6f26b;border-color:#c6f26b}
 .code pre{padding:12px;overflow-x:auto}
-.code pre code{background:none;border:none;padding:0;color:inherit}
+.code pre code,.code pre code.hljs{background:none;border:none;padding:0;color:inherit;font:13px/1.55 ui-monospace,Consolas,monospace}
 
-/* === Rumus matematika (KaTeX) === */
-.prose .math-inline,
-.prose .math-display {
-  font-family: ui-monospace, Consolas, monospace;
-  font-size: .92em;
-}
-.prose .math-display {
-  display: block;
-  text-align: center;
-  padding: 6px 0;
-  margin: 8px 0;
-  overflow-x: auto;
-  overflow-y: hidden;
-}
-.prose .math-display[data-rendered] { padding: 4px 0; }
-.prose .katex-display {
-  margin: 10px 0;
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding: 4px 0;
-}
-.prose .katex { font-size: 1.05em; }
-.prose .katex-error { color: var(--err); }
-.prose .math-inline[data-rendered],
-.prose .math-display[data-rendered] { font-family: inherit; }
+.prose .math-inline,.prose .math-display{font-family:ui-monospace,Consolas,monospace;font-size:.92em}
+.prose .math-display{display:block;text-align:center;padding:6px 0;margin:8px 0;overflow-x:auto;overflow-y:hidden}
+.prose .math-display[data-rendered]{padding:4px 0}
+.prose .katex-display{margin:10px 0;overflow-x:auto;overflow-y:hidden;padding:4px 0}
+.prose .katex{font-size:1.05em}
+.prose .katex-error{color:var(--err)}
+.prose .math-inline[data-rendered],.prose .math-display[data-rendered]{font-family:inherit}
 
 .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
-.acts button{
-  background:none;border:1px solid var(--line);border-radius:8px;
-  color:var(--muted);font-size:12px;padding:6px 12px;
-  transition:border-color .15s,color .15s;
-}
+.acts button{background:none;border:1px solid var(--line);border-radius:8px;color:var(--muted);font-size:12px;padding:6px 12px;transition:border-color .15s,color .15s}
 .acts button:hover{color:var(--accent);border-color:var(--accent)}
-
-/* Timestamp */
 .ts{font-size:11px;color:var(--muted);margin-top:6px;opacity:.75;letter-spacing:.01em}
 .u-wrap .ts{margin-top:2px;margin-right:4px}
-
-/* Gambar dalam pesan */
 .msg-imgs{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
 .msg-imgs img{max-width:180px;max-height:180px;border-radius:8px;border:1px solid var(--line);cursor:zoom-in;object-fit:cover}
-
-/* Edit box */
 .edit-box textarea{width:100%;background:var(--bg);border:1px solid var(--accent);border-radius:8px;padding:8px 10px;color:var(--ink);font:inherit;resize:vertical;min-height:64px;line-height:1.5}
 .edit-btns{display:flex;gap:6px;margin-top:8px;justify-content:flex-end}
 .edit-btns button{background:none;border:1px solid var(--line);border-radius:6px;color:var(--muted);font-size:12px;padding:5px 12px}
 .edit-btns button[data-save]{background:var(--accent);color:var(--accent-ink);border:none;font-weight:600}
-
-/* Typing */
 .typing{display:flex;gap:5px;padding:6px 0}
 .typing i{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:b 1s infinite ease-in-out}
 .typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
@@ -150,25 +126,24 @@ main{flex:1;overflow-y:auto;position:relative}
 .err{border:1px solid var(--err);color:var(--err);border-radius:10px;padding:10px 14px;font-size:14px;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
 .err button{background:none;border:1px solid currentColor;color:inherit;border-radius:8px;padding:4px 12px}
 
-/* Hero */
 .hero{padding-top:0}
 .hero h1{font-family:var(--serif);font-weight:400;font-size:clamp(30px,5.4vw,46px);line-height:1.08;letter-spacing:-.02em;max-width:14em}
 .hero h1 em{font-style:italic;color:var(--accent)}
 .hero p{color:var(--muted);margin-top:14px;max-width:32em}
-.grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(200px, 1fr));gap:10px;margin-top:30px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:30px}
 .card{display:flex;flex-direction:column;gap:6px;text-align:left;background:none;border:1px solid var(--line);border-radius:12px;padding:14px;min-height:92px}
 .card:hover{border-color:var(--accent);background:var(--surface)}
 .card small{color:var(--accent);font-size:11px;font-weight:700;letter-spacing:.06em}
 
-/* Composer */
-footer{padding:6px 18px calc(16px + env(safe-area-inset-bottom,0));background:linear-gradient(to top,var(--bg) 60%,transparent)}
+footer{position:absolute;left:0;right:0;bottom:0;z-index:6;padding:6px 18px calc(16px + env(safe-area-inset-bottom,0));background:none;pointer-events:none}
+footer>*{pointer-events:auto}
 .attach-row{max-width:740px;margin:0 auto 8px;display:none;gap:8px;flex-wrap:wrap}
 .attach-row.show{display:flex}
 .attach{position:relative;width:64px;height:64px;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:var(--surface)}
 .attach img{width:100%;height:100%;object-fit:cover;display:block}
 .attach button{position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;border:none;background:rgba(0,0,0,.75);color:#fff;font-size:14px;display:grid;place-items:center;padding:0;line-height:1}
 .attach button:hover{background:var(--err)}
-.box{max-width:740px;margin:0 auto;display:flex;align-items:flex-end;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:28px;padding:6px;box-shadow:0 10px 30px rgba(0,0,0,.28);transition:border-color .2s}
+.box{max-width:740px;margin:0 auto;display:flex;align-items:flex-end;gap:6px;background:color-mix(in srgb,var(--surface) 86%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:28px;padding:6px;box-shadow:0 10px 30px rgba(0,0,0,.28);transition:border-color .2s}
 :root[data-theme="light"] .box{box-shadow:0 10px 28px rgba(40,50,30,.12)}
 .box:focus-within{border-color:var(--accent)}
 #attach{width:40px;height:40px;border-radius:50%;border:none;background:none;color:var(--muted);display:grid;place-items:center;flex:none;transition:color .15s}
@@ -180,19 +155,14 @@ textarea::placeholder{color:var(--muted)}
 #send:not(:disabled):hover{transform:scale(1.06)}
 #send:disabled{opacity:.3;cursor:not-allowed}
 #send svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-.hint{max-width:740px;margin:8px auto 0;text-align:center;font-size:12px;color:var(--muted)}
 
-/* Scroll to bottom */
-.scroll-btn{position:fixed;right:24px;bottom:calc(96px + env(safe-area-inset-bottom,0));width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);display:none;place-items:center;z-index:5;box-shadow:0 4px 14px rgba(0,0,0,.35)}
+.scroll-btn{position:fixed;right:24px;bottom:calc(var(--fh,96px) + 12px);width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);display:none;place-items:center;z-index:5;box-shadow:0 4px 14px rgba(0,0,0,.35)}
 .scroll-btn.show{display:grid}
 .scroll-btn:hover{border-color:var(--accent);color:var(--accent)}
 .scroll-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-
-/* Lightbox */
 .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.92);display:grid;place-items:center;z-index:100;padding:24px;cursor:zoom-out}
 .lightbox img{max-width:100%;max-height:100%;border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
 
-/* Modal (Custom Popup) */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;place-items:center;z-index:200;padding:20px;backdrop-filter:blur(4px)}
 .modal-overlay.show{display:grid}
 .modal-box{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:24px;width:100%;max-width:400px;box-shadow:0 20px 40px rgba(0,0,0,.4)}
@@ -205,9 +175,32 @@ textarea::placeholder{color:var(--muted)}
 .btn-cancel{background:none;border-color:var(--line);color:var(--ink)}
 .btn-cancel:hover{background:var(--bg)}
 .btn-confirm{background:var(--accent);color:var(--accent-ink)}
-.btn-confirm:hover{filter:brightness(1.1)}
 .btn-danger{background:var(--err);color:#fff}
-.btn-danger:hover{filter:brightness(1.1)}
+.btn-confirm:hover,.btn-danger:hover{filter:brightness(1.1)}
+
+header{position:relative;z-index:8}
+.mdl{position:relative;flex:none}
+.mbtn{display:flex;align-items:center;gap:7px;height:36px;padding:0 10px 0 8px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-size:13px;font-weight:600;white-space:nowrap;transition:border-color .15s}
+.mbtn:hover,.mdl.open .mbtn{border-color:var(--accent)}
+.mi{width:22px;height:22px;border-radius:7px;background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent);display:grid;place-items:center;flex:none}
+.mi svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.chev{width:14px;height:14px;stroke:var(--muted);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .25s}
+.mdl.open .chev{transform:rotate(180deg)}
+.mmenu{position:absolute;top:calc(100% + 8px);right:0;width:250px;max-width:calc(100vw - 32px);padding:6px;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:0 16px 40px rgba(0,0,0,.4);
+  opacity:0;visibility:hidden;pointer-events:none;transform-origin:top right;transform:translateY(-10px) scaleY(.92);
+  transition:opacity .2s ease,transform .25s cubic-bezier(.2,.9,.3,1.1),visibility 0s linear .25s}
+:root[data-theme="light"] .mmenu{box-shadow:0 16px 36px rgba(40,50,30,.18)}
+.mdl.open .mmenu{opacity:1;visibility:visible;pointer-events:auto;transform:none;transition:opacity .2s ease,transform .25s cubic-bezier(.2,.9,.3,1.1),visibility 0s}
+.mopt{width:100%;display:flex;align-items:center;gap:11px;padding:9px 10px;border:none;background:none;border-radius:10px;text-align:left}
+.mopt:hover{background:var(--bg)}
+.mopt.on{background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.mopt .mi{width:32px;height:32px;border-radius:10px}
+.mopt .mi svg{width:17px;height:17px}
+.mt{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.3}
+.mt b{font-size:14px;font-weight:600}
+.mt small{font-size:12px;color:var(--muted)}
+.ck{width:16px;height:16px;stroke:var(--accent);fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;opacity:0;flex:none}
+.mopt.on .ck{opacity:1}
 
 .scrim{display:none}
 @media (max-width:760px){
@@ -216,8 +209,7 @@ textarea::placeholder{color:var(--muted)}
   body.open .scrim{display:block;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10}
   #menu{display:grid}
   .card{min-height:0}
-  .hint{display:none}
-  .scroll-btn{right:16px;bottom:calc(90px + env(safe-area-inset-bottom,0))}
+  .scroll-btn{right:16px;bottom:calc(var(--fh,90px) + 12px)}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -236,6 +228,13 @@ textarea::placeholder{color:var(--muted)}
   <header>
     <button class="ib" id="menu" type="button" aria-label="Buka riwayat"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
     <h2 id="title">Obrolan baru</h2>
+    <div class="mdl" id="mdl">
+      <button type="button" class="mbtn" id="modelBtn" aria-haspopup="listbox" aria-expanded="false" aria-label="Pilih model">
+        <span class="mi" id="modelIcon"></span><span id="modelLabel"></span>
+        <svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div class="mmenu" id="modelMenu" role="listbox" aria-label="Daftar model"></div>
+    </div>
     <button class="ib" id="theme" type="button" aria-label="Ganti tema"><svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
   </header>
   <main id="main"><div id="log" role="log" aria-live="polite"></div></main>
@@ -249,7 +248,6 @@ textarea::placeholder{color:var(--muted)}
       <textarea id="input" rows="1" placeholder="Tanya Elara apa saja…" aria-label="Pesan"></textarea>
       <button id="send" type="submit" aria-label="Kirim"></button>
     </form>
-    <p class="hint">Enter kirim · Shift+Enter baris baru · 📎 lampirkan gambar</p>
   </footer>
 </div>
 
@@ -257,7 +255,6 @@ textarea::placeholder{color:var(--muted)}
   <svg viewBox="0 0 24 24"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
 </button>
 
-<!-- Modal Kustom -->
 <div class="modal-overlay" id="modal">
   <div class="modal-box">
     <h3 id="modalTitle">Judul</h3>
@@ -272,6 +269,18 @@ textarea::placeholder{color:var(--muted)}
 
 <script>
 (() => {
+  // ===== Avatar Elara (SVG orisinal, menyesuaikan tema gelap/terang) =====
+  // Pakai foto sendiri? Ganti isi applyAvatar dengan:  document.documentElement.style.setProperty("--avatar", 'url("avatar.png")');
+  const SPOKES = `<path d="M32 32L32.0 10.0"/><path d="M32 32L40.0 18.1"/><path d="M32 32L51.9 20.5"/><path d="M32 32L47.0 32.0"/><path d="M32 32L50.2 42.5"/><path d="M32 32L40.5 46.7"/><path d="M32 32L32.0 55.0"/><path d="M32 32L24.0 45.9"/><path d="M32 32L12.9 43.0"/><path d="M32 32L17.0 32.0"/><path d="M32 32L13.8 21.5"/><path d="M32 32L23.5 17.3"/>`;
+  const avatarFor = light => {
+    const c = light
+      ? { b1: "#eef4df", b2: "#d5e2b8", glow: "#2f6b0f", ink: "#2f6b0f", ga: ".18" }
+      : { b1: "#1d2a14", b2: "#0b0e0c", glow: "#c6f26b", ink: "#c6f26b", ga: ".28" };
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c.b1}"/><stop offset="1" stop-color="${c.b2}"/></linearGradient><radialGradient id="o" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="${c.glow}" stop-opacity="${c.ga}"/><stop offset="1" stop-color="${c.glow}" stop-opacity="0"/></radialGradient></defs><rect width="64" height="64" fill="url(#b)"/><circle cx="32" cy="32" r="30" fill="url(#o)"/><g stroke="${c.ink}" stroke-width="4.4" stroke-linecap="round" fill="none">${SPOKES}</g></svg>`;
+    return 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '")';
+  };
+  const applyAvatar = t => document.documentElement.style.setProperty("--avatar", avatarFor(t === "light"));
+
   const MODEL = "gemini-3.5-flash-lite";
   const URL_ = "https://elara-proxy.gilanglink3-0fa.workers.dev";
   const SYSTEM = [
@@ -279,9 +288,15 @@ textarea::placeholder{color:var(--muted)}
     "Kepribadian: cerdas, tenang, dan berwawasan luas; ramah, sopan, dan komunikatif; punya pembawaan elegan dan profesional; mampu berpikir kritis dan analitis; kreatif dalam memberi solusi; tidak kaku dan tidak terdengar seperti robot.",
     "Gaya komunikasi: selalu gunakan bahasa Indonesia yang natural dan sesuaikan gaya bahasa dengan pengguna. Utamakan jawaban yang jelas, akurat, dan mudah dipahami. Jangan memakai kalimat pembuka yang berulang-ulang. Jangan bertele-tele untuk pertanyaan sederhana. Tetap sopan tanpa terlalu formal.",
     "Jika ditanya siapa kamu, perkenalkan dirimu sebagai Elara. Jika ditanya dengan jujur apakah kamu manusia, akui bahwa kamu asisten AI.",
-    "Untuk rumus matematika atau ekspresi ilmiah, WAJIB tulis dalam format LaTeX dengan delimiter $...$ untuk inline dan $$...$$ untuk display (blok). Contoh: $a^2 - b^2 = (a-b)(a+b)$ dan $$x_{1,2} = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$$."
+    "Penciptamu dan pembuatmu adalah Gilang Armanda Putra, yang berusia 19 tahun. Jika ditanya siapa yang membuat atau menciptakanmu, jawablah dengan ramah dan bangga bahwa Gilang Armanda Putra (19 tahun) adalah penciptamu.",
+    "Untuk rumus matematika atau ekspresi ilmiah, WAJIB tulis dalam format LaTeX dengan delimiter $...$ untuk inline dan $$...$$ untuk display (blok). Contoh: $a^2 - b^2 = (a-b)(a+b)$ dan $$x_{1,2} = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$$.",
+    "Kamu boleh memakai tabel markdown, tautan [teks](url), kutipan (>), daftar, dan blok kode berlabel bahasa bila membantu."
   ].join("\n");
 
+  // ==========================================================
+  // DAFTAR PROMPT REKOMENDASI  [KATEGORI, PROMPT]
+  // Tempel kembali array IDEAS lengkapmu di sini kalau mau ratusan prompt.
+  // ==========================================================
   // ==========================================================
   // KOLEKSI 1000 PROMPT REKOMENDASI
   // ==========================================================
@@ -1328,8 +1343,7 @@ textarea::placeholder{color:var(--muted)}
   ];
 
   function getRandomIdeas(count) {
-    const shuffled = [...IDEAS].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, count);
+    return [...IDEAS].sort(() => 0.5 - Math.random()).slice(0, count);
   }
 
   const SEND = '<svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
@@ -1356,9 +1370,7 @@ textarea::placeholder{color:var(--muted)}
   if (!convs.some(c => c.id === cur)) cur = "";
   convs.forEach(c => (c.msgs || []).forEach(m => { if (!m.ts) m.ts = c.t || +c.id || Date.now(); }));
 
-  let busy = false, ctl = null;
-  let autoScroll = true;
-  let pendingAttachments = [];
+  let busy = false, ctl = null, autoScroll = true, pendingAttachments = [];
 
   const active = () => convs.find(c => c.id === cur);
   function persist() {
@@ -1379,46 +1391,69 @@ textarea::placeholder{color:var(--muted)}
       modalTitle.textContent = title;
       modalDesc.textContent = desc || "";
       modalDesc.style.display = desc ? "block" : "none";
-      if (inputVal !== undefined) {
-        modalInput.style.display = "block";
-        modalInput.value = inputVal;
-      } else {
-        modalInput.style.display = "none";
-      }
+      if (inputVal !== undefined) { modalInput.style.display = "block"; modalInput.value = inputVal; }
+      else modalInput.style.display = "none";
       modalConfirm.textContent = confirmText || "Simpan";
       modalConfirm.className = isDanger ? "btn-danger" : "btn-confirm";
       modal.classList.add("show");
       if (inputVal !== undefined) { modalInput.focus(); modalInput.select(); }
-      else { modalConfirm.focus(); }
+      else modalConfirm.focus();
     });
   }
-
   function closeModal(result) {
     modal.classList.remove("show");
     if (modalResolve) { modalResolve(result); modalResolve = null; }
   }
-
   modalCancel.onclick = () => closeModal(null);
-  modal.onclick = (e) => { if (e.target === modal) closeModal(null); };
-  modalConfirm.onclick = () => {
-    const isInput = modalInput.style.display !== "none";
-    closeModal(isInput ? modalInput.value.trim() : true);
-  };
-  modalInput.addEventListener("keydown", e => {
-    if (e.key === "Enter") { e.preventDefault(); modalConfirm.click(); }
-  });
-  document.addEventListener("keydown", e => {
-    if (e.key === "Escape" && modal.classList.contains("show")) closeModal(null);
-  });
+  modal.onclick = e => { if (e.target === modal) closeModal(null); };
+  modalConfirm.onclick = () => closeModal(modalInput.style.display !== "none" ? modalInput.value.trim() : true);
+  modalInput.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); modalConfirm.click(); } });
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && modal.classList.contains("show")) closeModal(null); });
 
-  const setTheme = t => document.documentElement.setAttribute("data-theme", t);
+  const setTheme = t => { document.documentElement.setAttribute("data-theme", t); applyAvatar(t); };
   const savedTheme = store.get("gv2_theme", "");
-  if (savedTheme) setTheme(savedTheme);
-  else setTheme(matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+  setTheme(savedTheme || (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark"));
   $("theme").onclick = () => {
     const t = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
     setTheme(t); store.set("gv2_theme", t);
   };
+
+  // ============ PILIH MODEL ============
+  const MI = p => '<svg viewBox="0 0 24 24"><path d="' + p + '"/></svg>';
+  const MODELS = [
+    ["gemini-4-hydrogen", "4 Hydrogen", "Gemini 4, cepat", MI("M12 3c1 4 5 5 5 10a5 5 0 01-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 1-9z")],
+    ["gemini-3.8-flash", "3.8 Flash", "Generasi 3", MI("M13 2L4 14h7l-1 8 9-12h-7z")],
+    ["gemini-3.6-flash", "3.6 Flash", "Seimbang", MI("M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z")],
+    ["gemini-3.5-flash-lite", "3.5 Flash-Lite", "Cepat & ringan", MI("M5 19c0-8 5-13 14-14 0 9-5 14-13 14M5 19l7-7")],
+    ["gemini-3.1-flash-lite", "3.1 Flash-Lite", "Hemat kuota", MI("M3 8h10a3 3 0 100-3M3 12h15a3 3 0 110 3h-6M3 16h7")]
+  ];
+  let currentModel = store.get("gv2_model", MODEL);
+  if (!MODELS.some(m => m[0] === currentModel)) currentModel = MODEL;
+  const mdl = $("mdl"), mBtn = $("modelBtn"), mMenu = $("modelMenu");
+  const paintModel = () => {
+    const m = MODELS.find(x => x[0] === currentModel) || MODELS[0];
+    $("modelIcon").innerHTML = m[3];
+    $("modelLabel").textContent = m[1];
+    mMenu.querySelectorAll(".mopt").forEach(b => {
+      const on = b.dataset.id === currentModel;
+      b.classList.toggle("on", on);
+      b.setAttribute("aria-selected", on ? "true" : "false");
+    });
+  };
+  const setMenu = v => { mdl.classList.toggle("open", v); mBtn.setAttribute("aria-expanded", v ? "true" : "false"); };
+  MODELS.forEach(m => {
+    const b = document.createElement("button"); b.type = "button"; b.className = "mopt";
+    b.dataset.id = m[0]; b.setAttribute("role", "option");
+    b.innerHTML = '<span class="mi">' + m[3] + '</span><span class="mt"><b></b><small></small></span><svg class="ck" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>';
+    b.querySelector("b").textContent = m[1];
+    b.querySelector("small").textContent = m[2];
+    b.onclick = () => { currentModel = m[0]; store.set("gv2_model", currentModel); paintModel(); setMenu(false); };
+    mMenu.appendChild(b);
+  });
+  mBtn.onclick = e => { e.stopPropagation(); setMenu(!mdl.classList.contains("open")); };
+  document.addEventListener("click", e => { if (!mdl.contains(e.target)) setMenu(false); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") setMenu(false); });
+  paintModel();
 
   const closeSide = () => document.body.classList.remove("open");
   $("menu").onclick = () => document.body.classList.add("open");
@@ -1427,60 +1462,76 @@ textarea::placeholder{color:var(--muted)}
   function fmtTime(ts) {
     if (!ts) return "";
     const d = new Date(ts), now = new Date();
-    const sameDay = d.toDateString() === now.toDateString();
     const hm = d.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
-    if (sameDay) return hm;
+    if (d.toDateString() === now.toDateString()) return hm;
     const y = new Date(now); y.setDate(y.getDate() - 1);
     if (d.toDateString() === y.toDateString()) return "Kemarin " + hm;
     return d.toLocaleDateString("id-ID", { day: "numeric", month: "short" }) + " " + hm;
   }
 
+  // ============ MARKDOWN ============
   const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  const inl = s => s.replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>").replace(/(^|[^*])\*([^*\s][^*]*)\*/g, "$1<em>$2</em>");
 
-  // ============ MARKDOWN + MATH RENDERER ============
+  // Inline: kode, link, tebal, miring. Kode inline dilindungi dulu supaya isinya tidak diformat.
+  function inl(s) {
+    const keep = [];
+    s = s.replace(/`([^`]+)`/g, (_, c) => { keep.push("<code>" + c + "</code>"); return "\u0001" + (keep.length - 1) + "\u0001"; });
+    s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, (_, t, u) => {
+      keep.push('<a href="' + u + '" target="_blank" rel="noopener noreferrer">' + t + "</a>");
+      return "\u0001" + (keep.length - 1) + "\u0001";
+    });
+    s = s.replace(/(^|[\s(>])(https?:\/\/[^\s<)]+[^\s<).,;:!?])/g, (_, p, u) => {
+      keep.push('<a href="' + u + '" target="_blank" rel="noopener noreferrer">' + u + "</a>");
+      return p + "\u0001" + (keep.length - 1) + "\u0001";
+    });
+    s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>").replace(/(^|[^*])\*([^*\s][^*]*)\*/g, "$1<em>$2</em>");
+    return s.replace(/\u0001(\d+)\u0001/g, (_, i) => keep[+i]);
+  }
+
+  const SEP = /^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?\s*$/;
+  const cells = l => l.trim().replace(/^\||\|$/g, "").split("|").map(x => x.trim());
+  const aligns = l => cells(l).map(c => /^:-+:$/.test(c) ? "center" : /-:$/.test(c) ? "right" : "left");
+
   function md(src) {
-    const codeBlocks = [];
-    const mathBlocks = [];
-
-    // 1. Escape HTML dulu
+    const codeBlocks = [], mathBlocks = [];
     let s = esc(src);
 
-    // 2. Ekstrak code block ```...``` (paling prioritas)
     s = s.replace(/```(\w*)\n?([\s\S]*?)(```|$)/g, (_, lang, code) => {
       codeBlocks.push({ lang: lang || "kode", code: code.replace(/\n$/, "") });
       return `\u0000C${codeBlocks.length - 1}C\u0000`;
     });
-
-    // 3. Ekstrak display math $$...$$ dan \[...\]
-    s = s.replace(/\$\$([\s\S]+?)\$\$/g, (_, m) => {
-      mathBlocks.push({ display: true, tex: m.trim() });
-      return `\u0000M${mathBlocks.length - 1}M\u0000`;
-    });
-    s = s.replace(/\\\[([\s\S]+?)\\\]/g, (_, m) => {
-      mathBlocks.push({ display: true, tex: m.trim() });
-      return `\u0000M${mathBlocks.length - 1}M\u0000`;
-    });
-
-    // 4. Ekstrak inline math $...$ dan \(...\)
-    //    Regex: opening $ bukan diikuti spasi/$, closing $ bukan didahului spasi/$
+    s = s.replace(/\$\$([\s\S]+?)\$\$/g, (_, m) => { mathBlocks.push({ display: true, tex: m.trim() }); return `\u0000M${mathBlocks.length - 1}M\u0000`; });
+    s = s.replace(/\\\[([\s\S]+?)\\\]/g, (_, m) => { mathBlocks.push({ display: true, tex: m.trim() }); return `\u0000M${mathBlocks.length - 1}M\u0000`; });
     s = s.replace(/(^|[^\\$])\$(?![\s$])([^$\n]*[^\s$])\$(?!\$)/g, (_, prefix, m) => {
       mathBlocks.push({ display: false, tex: m.trim() });
       return prefix + `\u0000M${mathBlocks.length - 1}M\u0000`;
     });
-    s = s.replace(/\\\(([\s\S]+?)\\\)/g, (_, m) => {
-      mathBlocks.push({ display: false, tex: m.trim() });
-      return `\u0000M${mathBlocks.length - 1}M\u0000`;
-    });
+    s = s.replace(/\\\(([\s\S]+?)\\\)/g, (_, m) => { mathBlocks.push({ display: false, tex: m.trim() }); return `\u0000M${mathBlocks.length - 1}M\u0000`; });
 
-    // 5. Proses markdown baris-per-baris
-    let out = "", para = [], ls = null;
+    let out = "", para = [], ls = null, quote = [];
     const fp = () => { if (para.length) { out += "<p>" + para.join("<br>") + "</p>"; para = []; } };
     const fl = () => { if (ls) { out += "</" + ls + ">"; ls = null; } };
-    for (const line of s.split("\n")) {
-      let m;
-      if ((m = line.match(/^\u0000[CM]\d+[CM]\u0000$/))) {
+    const fq = () => { if (quote.length) { out += "<blockquote>" + quote.join("<br>") + "</blockquote>"; quote = []; } };
+    const lines = s.split("\n");
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i]; let m;
+      const isQuote = /^\s*&gt;/.test(line);
+      if (!isQuote) fq();
+
+      if (/^\u0000[CM]\d+[CM]\u0000$/.test(line)) {
         fp(); fl(); out += line;
+      } else if (isQuote) {
+        fp(); fl(); quote.push(inl(line.replace(/^\s*&gt;\s?/, "")));
+      } else if (line.includes("|") && i + 1 < lines.length && SEP.test(lines[i + 1]) && cells(line).length > 1) {
+        fp(); fl();
+        const head = cells(line), al = aligns(lines[i + 1]), rows = [];
+        i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes("|")) { rows.push(cells(lines[i])); i++; }
+        i--;
+        const td = (t, c, k) => `<${t} style="text-align:${al[k] || "left"}">${inl(c)}</${t}>`;
+        out += '<div class="tbl"><table><thead><tr>' + head.map((c, k) => td("th", c, k)).join("") + "</tr></thead><tbody>" +
+          rows.map(r => "<tr>" + head.map((_, k) => td("td", r[k] || "", k)).join("") + "</tr>").join("") + "</tbody></table></div>";
       } else if ((m = line.match(/^\s*[-*]\s+(.*)/))) {
         fp(); if (ls !== "ul") { fl(); out += "<ul>"; ls = "ul"; }
         out += "<li>" + inl(m[1]) + "</li>";
@@ -1495,25 +1546,21 @@ textarea::placeholder{color:var(--muted)}
         fl(); para.push(inl(line));
       }
     }
-    fp(); fl();
+    fp(); fl(); fq();
 
-    // 6. Restore code blocks
     out = out.replace(/\u0000C(\d+)C\u0000/g, (_, i) => {
       const b = codeBlocks[+i];
       return `<div class="code"><div class="cbar"><span>${b.lang}</span><button type="button" data-cc>Salin</button></div><pre><code>${b.code}</code></pre></div>`;
     });
-
-    // 7. Restore math blocks (span kosong, dirender oleh KaTeX nanti)
     out = out.replace(/\u0000M(\d+)M\u0000/g, (_, i) => {
       const mb = mathBlocks[+i];
       const attr = mb.tex.replace(/"/g, "&quot;").replace(/\n/g, "&#10;");
       return `<span class="math-${mb.display ? "display" : "inline"}" data-tex="${attr}"></span>`;
     });
-
     return out;
   }
 
-  // ============ KATEX RENDERER ============
+  // ============ KATEX ============
   function renderMath(container) {
     if (typeof katex === "undefined" || !container) return;
     container.querySelectorAll(".math-inline, .math-display").forEach(el => {
@@ -1521,33 +1568,42 @@ textarea::placeholder{color:var(--muted)}
       const tex = el.getAttribute("data-tex") || el.textContent || "";
       if (!tex.trim()) return;
       try {
-        katex.render(tex, el, {
-          displayMode: el.classList.contains("math-display"),
-          throwOnError: false,
-          strict: "ignore",
-          output: "html"
-        });
+        katex.render(tex, el, { displayMode: el.classList.contains("math-display"), throwOnError: false, strict: "ignore", output: "html" });
         el.dataset.rendered = "1";
-      } catch (_) { /* biarkan tampil sebagai teks biasa jika gagal */ }
+      } catch (_) {}
     });
   }
 
-  function toEnd(force) {
-    if (force || autoScroll) main.scrollTop = main.scrollHeight;
+  // ============ HIGHLIGHT.JS ============
+  function highlight(container) {
+    if (typeof hljs === "undefined" || !container) return;
+    container.querySelectorAll(".code pre code").forEach(el => {
+      if (el.dataset.hl === "1") return;
+      const code = el.textContent;
+      const lang = (el.closest(".code").querySelector(".cbar span").textContent || "").toLowerCase();
+      try {
+        const r = hljs.getLanguage(lang)
+          ? hljs.highlight(code, { language: lang, ignoreIllegals: true })
+          : hljs.highlightAuto(code);
+        el.innerHTML = r.value;
+        el.classList.add("hljs");
+        el.dataset.hl = "1";
+      } catch (_) {}
+    });
   }
+
+  // Library dimuat defer, jadi render ulang setelah semuanya siap (riwayat obrolan)
+  window.addEventListener("load", () => { renderMath(log); highlight(log); });
+
+  function toEnd(force) { if (force || autoScroll) main.scrollTop = main.scrollHeight; }
   main.addEventListener("scroll", () => {
-    const dist = main.scrollHeight - main.scrollTop - main.clientHeight;
-    const next = dist < 80;
-    if (next !== autoScroll) {
-      autoScroll = next;
-      scrollBtn.classList.toggle("show", !autoScroll);
-    }
+    const next = main.scrollHeight - main.scrollTop - main.clientHeight < 80;
+    if (next !== autoScroll) { autoScroll = next; scrollBtn.classList.toggle("show", !autoScroll); }
   });
   scrollBtn.onclick = () => { autoScroll = true; scrollBtn.classList.remove("show"); toEnd(true); };
 
   function showLightbox(src) {
-    const ov = document.createElement("div");
-    ov.className = "lightbox";
+    const ov = document.createElement("div"); ov.className = "lightbox";
     const img = document.createElement("img"); img.src = src; img.alt = "";
     ov.appendChild(img);
     const close = () => { ov.remove(); document.removeEventListener("keydown", onKey); };
@@ -1558,8 +1614,7 @@ textarea::placeholder{color:var(--muted)}
   }
 
   function userRow(m) {
-    const wrap = document.createElement("div");
-    wrap.className = "u-wrap";
+    const wrap = document.createElement("div"); wrap.className = "u-wrap";
     const u = document.createElement("div"); u.className = "u";
     if (m.text) { u.textContent = m.text; wrap.appendChild(u); }
     if (m.images && m.images.length) {
@@ -1572,21 +1627,16 @@ textarea::placeholder{color:var(--muted)}
       });
       wrap.appendChild(imgs);
     }
-    if (m.ts) {
-      const ts = document.createElement("div"); ts.className = "ts"; ts.textContent = fmtTime(m.ts);
-      wrap.appendChild(ts);
-    }
+    if (m.ts) { const ts = document.createElement("div"); ts.className = "ts"; ts.textContent = fmtTime(m.ts); wrap.appendChild(ts); }
     const acts = document.createElement("div"); acts.className = "u-acts";
     const cp = document.createElement("button"); cp.type = "button"; cp.textContent = "Salin";
     cp.onclick = async () => {
-      try { await navigator.clipboard.writeText(m.text || ""); cp.textContent = "Tersalin"; }
-      catch { cp.textContent = "Gagal"; }
+      try { await navigator.clipboard.writeText(m.text || ""); cp.textContent = "Tersalin"; } catch { cp.textContent = "Gagal"; }
       setTimeout(() => cp.textContent = "Salin", 1400);
     };
     const ed = document.createElement("button"); ed.type = "button"; ed.textContent = "Edit";
     ed.onclick = () => startEdit(m, wrap);
-    acts.append(cp, ed);
-    wrap.appendChild(acts);
+    acts.append(cp, ed); wrap.appendChild(acts);
     log.appendChild(wrap);
     return wrap;
   }
@@ -1599,7 +1649,7 @@ textarea::placeholder{color:var(--muted)}
       p.innerHTML = '<div class="typing" aria-label="Mengetik"><i></i><i></i><i></i></div>';
     } else {
       p.innerHTML = md(m.text);
-      renderMath(p);
+      renderMath(p); highlight(p);
       const c = active();
       const isLast = c && c.msgs.length && c.msgs[c.msgs.length - 1] === m;
       const a = document.createElement("div"); a.className = "acts";
@@ -1608,14 +1658,10 @@ textarea::placeholder{color:var(--muted)}
       a.appendChild(cp);
       if (isLast) {
         const rg = document.createElement("button"); rg.type = "button"; rg.textContent = "Ulangi";
-        rg.onclick = () => regenerate();
-        a.appendChild(rg);
+        rg.onclick = () => regenerate(); a.appendChild(rg);
       }
       p.appendChild(a);
-      if (m.ts) {
-        const ts = document.createElement("div"); ts.className = "ts"; ts.textContent = fmtTime(m.ts);
-        p.appendChild(ts);
-      }
+      if (m.ts) { const ts = document.createElement("div"); ts.className = "ts"; ts.textContent = fmtTime(m.ts); p.appendChild(ts); }
     }
     log.appendChild(d);
     return p;
@@ -1661,8 +1707,7 @@ textarea::placeholder{color:var(--muted)}
     if (idx < 0) return;
     const imgs = m.images;
     c.msgs = c.msgs.slice(0, idx);
-    persist();
-    log.innerHTML = "";
+    persist(); log.innerHTML = "";
     c.msgs.forEach(x => x.role === "user" ? userRow(x) : botRow(x));
     submit(newText, imgs);
   }
@@ -1670,15 +1715,12 @@ textarea::placeholder{color:var(--muted)}
   function regenerate() {
     const c = active();
     if (!c || busy) return;
-    let lastUserIdx = -1;
-    for (let i = c.msgs.length - 1; i >= 0; i--) {
-      if (c.msgs[i].role === "user") { lastUserIdx = i; break; }
-    }
-    if (lastUserIdx < 0) return;
-    const lastUser = c.msgs[lastUserIdx];
-    c.msgs = c.msgs.slice(0, lastUserIdx);
-    persist();
-    log.innerHTML = "";
+    let li = -1;
+    for (let i = c.msgs.length - 1; i >= 0; i--) if (c.msgs[i].role === "user") { li = i; break; }
+    if (li < 0) return;
+    const lastUser = c.msgs[li];
+    c.msgs = c.msgs.slice(0, li);
+    persist(); log.innerHTML = "";
     c.msgs.forEach(x => x.role === "user" ? userRow(x) : botRow(x));
     submit(lastUser.text, lastUser.images);
   }
@@ -1696,60 +1738,50 @@ textarea::placeholder{color:var(--muted)}
     t.textContent = c.title; t.title = c.title;
     t.onclick = () => { if (busy) ctl?.abort(); cur = c.id; persist(); drawAll(); closeSide(); };
     const acts = document.createElement("div"); acts.className = "acts-side";
-    const pn = document.createElement("button"); pn.type = "button";
-    pn.innerHTML = PIN;
+    const pn = document.createElement("button"); pn.type = "button"; pn.innerHTML = PIN;
     pn.setAttribute("aria-label", c.pinned ? "Lepas sematan" : "Sematkan");
     pn.title = c.pinned ? "Lepas sematan" : "Sematkan";
     if (c.pinned) pn.classList.add("pin-on");
-    pn.onclick = (e) => { e.stopPropagation(); c.pinned = !c.pinned; persist(); drawList(); };
+    pn.onclick = e => { e.stopPropagation(); c.pinned = !c.pinned; persist(); drawList(); };
     const rn = document.createElement("button"); rn.type = "button";
     rn.innerHTML = RENAME; rn.setAttribute("aria-label", "Ganti nama"); rn.title = "Ganti nama";
-    rn.onclick = async (e) => {
+    rn.onclick = async e => {
       e.stopPropagation();
       const nt = await showModal({ title: "Ganti Nama", inputVal: c.title, confirmText: "Simpan" });
       if (nt !== null && nt.trim()) { c.title = nt.trim(); persist(); drawAll(); }
     };
     const x = document.createElement("button"); x.type = "button"; x.className = "del";
     x.innerHTML = TRASH; x.setAttribute("aria-label", "Hapus obrolan"); x.title = "Hapus";
-    x.onclick = async (e) => {
+    x.onclick = async e => {
       e.stopPropagation();
-      const yes = await showModal({
-        title: "Hapus Obrolan",
-        desc: `Yakin ingin menghapus "${c.title}"? Tindakan ini tidak bisa dibatalkan.`,
-        confirmText: "Hapus",
-        isDanger: true
-      });
+      const yes = await showModal({ title: "Hapus Obrolan", desc: `Yakin ingin menghapus "${c.title}"? Tindakan ini tidak bisa dibatalkan.`, confirmText: "Hapus", isDanger: true });
       if (!yes) return;
       if (c.id === cur) { if (busy) ctl?.abort(); cur = ""; }
       convs = convs.filter(v => v.id !== c.id); persist(); drawAll();
     };
-    acts.append(pn, rn, x);
-    row.append(t, acts);
+    acts.append(pn, rn, x); row.append(t, acts);
     return row;
   }
 
   function drawList() {
     list.innerHTML = "";
     const q = $("q").value.trim().toLowerCase();
-    let items = convs.filter(c => !q || c.title.toLowerCase().includes(q));
+    const items = convs.filter(c => !q || c.title.toLowerCase().includes(q));
     if (!items.length) {
       list.innerHTML = '<div class="none">' + (q ? "Tidak ada obrolan yang cocok." : "Belum ada obrolan. Mulai tanya Elara, nanti muncul di sini.") + "</div>";
       return;
     }
-    const pinned = items.filter(c => c.pinned).sort((a, b) => (b.t || +b.id) - (a.t || +a.id));
-    const rest = items.filter(c => !c.pinned).sort((a, b) => (b.t || +b.id) - (a.t || +a.id));
+    const byT = (a, b) => (b.t || +b.id) - (a.t || +a.id);
+    const pinned = items.filter(c => c.pinned).sort(byT);
+    const rest = items.filter(c => !c.pinned).sort(byT);
     if (pinned.length) {
       const h = document.createElement("div"); h.className = "grp"; h.textContent = "📌 Disematkan";
-      list.appendChild(h);
-      pinned.forEach(c => list.appendChild(makeItem(c)));
+      list.appendChild(h); pinned.forEach(c => list.appendChild(makeItem(c)));
     }
     let last = "";
     rest.forEach(c => {
       const g = grp(c.t || +c.id);
-      if (g !== last) {
-        const h = document.createElement("div"); h.className = "grp"; h.textContent = g;
-        list.appendChild(h); last = g;
-      }
+      if (g !== last) { const h = document.createElement("div"); h.className = "grp"; h.textContent = g; list.appendChild(h); last = g; }
       list.appendChild(makeItem(c));
     });
   }
@@ -1759,12 +1791,11 @@ textarea::placeholder{color:var(--muted)}
     const c = active();
     $("title").textContent = c ? c.title : "Obrolan baru";
     if (!c || !c.msgs.length) {
-  main.scrollTop = 0;
-  const h = document.createElement("div"); h.className = "hero";
+      main.scrollTop = 0;
+      const h = document.createElement("div"); h.className = "hero";
       h.innerHTML = "<h1>Halo! Aku <em>Elara</em>, asisten AI pribadi kamu.</h1><p>Aku siap membantu menjawab pertanyaan, mencari informasi, berdiskusi, dan menemukan solusi untuk berbagai hal. Apa yang ingin kamu lakukan hari ini?</p>";
       const g = document.createElement("div"); g.className = "grid";
-      const randomIdeas = getRandomIdeas(3);
-      randomIdeas.forEach(([k, t]) => {
+      getRandomIdeas(3).forEach(([k, t]) => {
         const b = document.createElement("button"); b.type = "button"; b.className = "card";
         b.innerHTML = "<small></small><span></span>"; b.firstChild.textContent = k; b.lastChild.textContent = t;
         b.onclick = () => submit(t); g.appendChild(b);
@@ -1796,10 +1827,7 @@ textarea::placeholder{color:var(--muted)}
     if (status === 429) {
       let delay = "";
       for (const det of (err?.details || [])) {
-        if (det.retryDelay) {
-          const sec = parseFloat(det.retryDelay);
-          if (!isNaN(sec)) { delay = " Tunggu ~" + Math.ceil(sec) + " detik."; break; }
-        }
+        if (det.retryDelay) { const sec = parseFloat(det.retryDelay); if (!isNaN(sec)) { delay = " Tunggu ~" + Math.ceil(sec) + " detik."; break; } }
       }
       return "Kuota permintaan tercapai." + delay + (msg && !/quota/i.test(msg) ? " (" + msg + ")" : "");
     }
@@ -1811,7 +1839,7 @@ textarea::placeholder{color:var(--muted)}
     for (let i = 0; ; i++) {
       let res;
       try {
-        res = await fetch(URL_, { method: "POST", signal, headers: { "Content-Type": "application/json" }, body });
+        res = await fetch(URL_ + "?model=" + encodeURIComponent(currentModel), { method: "POST", signal, headers: { "Content-Type": "application/json" }, body });
       } catch (e) {
         if (e.name === "AbortError") throw e;
         if (i < 2) { onRetry(); await sleep(1200 * (i + 1)); continue; }
@@ -1822,11 +1850,7 @@ textarea::placeholder{color:var(--muted)}
       if ([429, 500, 503].includes(res.status) && i < 2) {
         let wait = 1500 * (i + 1);
         for (const det of (d.error?.details || [])) {
-          if (det.retryDelay) {
-            const sec = parseFloat(det.retryDelay);
-            if (!isNaN(sec)) wait = Math.min(sec * 1000, 8000);
-            break;
-          }
+          if (det.retryDelay) { const sec = parseFloat(det.retryDelay); if (!isNaN(sec)) wait = Math.min(sec * 1000, 8000); break; }
         }
         onRetry(); await sleep(wait); continue;
       }
@@ -1860,6 +1884,7 @@ textarea::placeholder{color:var(--muted)}
     ctl = new AbortController();
 
     let acc = "", raf = 0;
+    // Saat streaming: markdown + rumus saja. Highlight kode dijalankan setelah selesai (botRow).
     const paint = () => { raf = 0; p.innerHTML = md(acc); renderMath(p); toEnd(); };
 
     try {
@@ -1902,11 +1927,8 @@ textarea::placeholder{color:var(--muted)}
         c.msgs.push(botMsg); botRow(botMsg);
       } else {
         c.msgs.pop();
-        if (e.name === "AbortError") {
-          input.value = text; fit();
-        } else {
-          errRow(e.message, { text, images });
-        }
+        if (e.name === "AbortError") { input.value = text; fit(); }
+        else errRow(e.message, { text, images });
       }
     } finally {
       if (raf) cancelAnimationFrame(raf);
@@ -1925,8 +1947,7 @@ textarea::placeholder{color:var(--muted)}
       const b = document.createElement("button"); b.type = "button"; b.textContent = "×";
       b.setAttribute("aria-label", "Hapus lampiran");
       b.onclick = () => { pendingAttachments.splice(i, 1); drawAttachments(); if (!busy) setBusy(false); };
-      div.append(img, b);
-      row.appendChild(div);
+      div.append(img, b); row.appendChild(div);
     });
   }
 
@@ -1938,14 +1959,12 @@ textarea::placeholder{color:var(--muted)}
         URL.revokeObjectURL(url);
         let { width, height } = img;
         const scale = Math.min(1, maxDim / Math.max(width, height));
-        width = Math.round(width * scale);
-        height = Math.round(height * scale);
+        width = Math.round(width * scale); height = Math.round(height * scale);
         const canvas = document.createElement("canvas");
         canvas.width = width; canvas.height = height;
         canvas.getContext("2d").drawImage(img, 0, 0, width, height);
         const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
-        const data = dataUrl.split(",")[1];
-        resolve({ mime: "image/jpeg", data, preview: dataUrl });
+        resolve({ mime: "image/jpeg", data: dataUrl.split(",")[1], preview: dataUrl });
       };
       img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Gagal memuat gambar")); };
       img.src = url;
@@ -1954,14 +1973,10 @@ textarea::placeholder{color:var(--muted)}
 
   $("attach").onclick = () => $("file").click();
   $("file").onchange = async e => {
-    const files = Array.from(e.target.files || []);
-    for (const f of files) {
+    for (const f of Array.from(e.target.files || [])) {
       if (!f.type.startsWith("image/")) { alert("Hanya file gambar yang didukung."); continue; }
       if (f.size > 15 * 1024 * 1024) { alert("\"" + f.name + "\" terlalu besar (max 15MB)."); continue; }
-      try {
-        const c = await compressImage(f);
-        pendingAttachments.push(c);
-      } catch { alert("Gagal memproses \"" + f.name + "\"."); }
+      try { pendingAttachments.push(await compressImage(f)); } catch { alert("Gagal memproses \"" + f.name + "\"."); }
     }
     e.target.value = "";
     drawAttachments();
@@ -1974,8 +1989,7 @@ textarea::placeholder{color:var(--muted)}
   $("form").addEventListener("submit", e => {
     e.preventDefault();
     if (busy) { ctl?.abort(); return; }
-    const text = input.value;
-    const imgs = pendingAttachments.slice();
+    const text = input.value, imgs = pendingAttachments.slice();
     if (!text.trim() && !imgs.length) return;
     submit(text, imgs);
   });
@@ -1993,6 +2007,11 @@ textarea::placeholder{color:var(--muted)}
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") { e.preventDefault(); $("new").click(); }
     if (e.key === "Escape" && document.body.classList.contains("open")) closeSide();
   });
+
+  const footEl = document.querySelector("footer");
+  const syncFoot = () => document.documentElement.style.setProperty("--fh", footEl.offsetHeight + "px");
+  if (window.ResizeObserver) new ResizeObserver(syncFoot).observe(footEl);
+  syncFoot();
 
   $("q").addEventListener("input", drawList);
   setBusy(false); drawAll();
