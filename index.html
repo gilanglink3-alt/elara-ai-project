@@ -4,6 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Elara · Asisten AI Pribadi</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
 <style>
 :root{
   --bg:#0f1311; --side:#0b0e0c; --surface:#171c19; --ink:#e9eee9; --muted:#8d978f; --line:#252c27;
@@ -90,6 +92,32 @@ main{flex:1;overflow-y:auto;position:relative}
 .cbar button:hover{color:#c6f26b;border-color:#c6f26b}
 .code pre{padding:12px;overflow-x:auto}
 .code pre code{background:none;border:none;padding:0;color:inherit}
+
+/* === Rumus matematika (KaTeX) === */
+.prose .math-inline,
+.prose .math-display {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: .92em;
+}
+.prose .math-display {
+  display: block;
+  text-align: center;
+  padding: 6px 0;
+  margin: 8px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.prose .math-display[data-rendered] { padding: 4px 0; }
+.prose .katex-display {
+  margin: 10px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 0;
+}
+.prose .katex { font-size: 1.05em; }
+.prose .katex-error { color: var(--err); }
+.prose .math-inline[data-rendered],
+.prose .math-display[data-rendered] { font-family: inherit; }
 
 .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
 .acts button{
@@ -250,15 +278,12 @@ textarea::placeholder{color:var(--muted)}
     "Kamu adalah Elara, asisten AI pribadi perempuan. Gunakan sapaan 'aku' untuk dirimu dan 'kamu' untuk pengguna.",
     "Kepribadian: cerdas, tenang, dan berwawasan luas; ramah, sopan, dan komunikatif; punya pembawaan elegan dan profesional; mampu berpikir kritis dan analitis; kreatif dalam memberi solusi; tidak kaku dan tidak terdengar seperti robot.",
     "Gaya komunikasi: selalu gunakan bahasa Indonesia yang natural dan sesuaikan gaya bahasa dengan pengguna. Utamakan jawaban yang jelas, akurat, dan mudah dipahami. Jangan memakai kalimat pembuka yang berulang-ulang. Jangan bertele-tele untuk pertanyaan sederhana. Tetap sopan tanpa terlalu formal.",
-    "Jika ditanya siapa kamu, perkenalkan dirimu sebagai Elara. Jika ditanya dengan jujur apakah kamu manusia, akui bahwa kamu asisten AI."
+    "Jika ditanya siapa kamu, perkenalkan dirimu sebagai Elara. Jika ditanya dengan jujur apakah kamu manusia, akui bahwa kamu asisten AI.",
+    "Untuk rumus matematika atau ekspresi ilmiah, WAJIB tulis dalam format LaTeX dengan delimiter $...$ untuk inline dan $$...$$ untuk display (blok). Contoh: $a^2 - b^2 = (a-b)(a+b)$ dan $$x_{1,2} = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$$."
   ].join("\n");
 
   // ==========================================================
   // KOLEKSI 1000 PROMPT REKOMENDASI
-  // 20 kategori × 50 prompt = 1000 prompt
-  // Tidak memakai tahun 2024; jika perlu referensi waktu pakai
-  // "saat ini", "tahun ini", "terbaru", atau "sekarang".
-  // Format: ["KATEGORI", "Teks Prompt"]
   // ==========================================================
   const IDEAS = [
     // ================== KODING (50) ==================
@@ -1300,12 +1325,9 @@ textarea::placeholder{color:var(--muted)}
     ["LINGKUNGAN", "Cara membuat kompos skala rumahan"],
     ["LINGKUNGAN", "Beri tips mengurangi jejak digital"],
     ["LINGKUNGAN", "Cara membuat blog lingkungan"]
-    // Silakan tambahkan prompt baru di atas dengan format: ["KATEGORI", "Teks Prompt"]
   ];
 
-  // Fungsi untuk mengambil 3 prompt secara acak
   function getRandomIdeas(count) {
-    // Salin array agar tidak mengubah array asli
     const shuffled = [...IDEAS].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, count);
   }
@@ -1318,9 +1340,8 @@ textarea::placeholder{color:var(--muted)}
 
   const $ = id => document.getElementById(id);
   const log = $("log"), main = $("main"), input = $("input"), send = $("send"), list = $("list"), scrollBtn = $("scrollBtn");
-  
-  // Elemen Modal
-  const modal = $("modal"), modalTitle = $("modalTitle"), modalDesc = $("modalDesc"), 
+
+  const modal = $("modal"), modalTitle = $("modalTitle"), modalDesc = $("modalDesc"),
         modalInput = $("modalInput"), modalCancel = $("modalCancel"), modalConfirm = $("modalConfirm");
   let modalResolve = null;
 
@@ -1352,41 +1373,29 @@ textarea::placeholder{color:var(--muted)}
     store.set("gv2_cur", cur);
   }
 
-  /* Logika Modal */
   function showModal({ title, desc, inputVal, confirmText, isDanger }) {
     return new Promise(resolve => {
       modalResolve = resolve;
       modalTitle.textContent = title;
       modalDesc.textContent = desc || "";
       modalDesc.style.display = desc ? "block" : "none";
-      
       if (inputVal !== undefined) {
         modalInput.style.display = "block";
         modalInput.value = inputVal;
       } else {
         modalInput.style.display = "none";
       }
-      
       modalConfirm.textContent = confirmText || "Simpan";
       modalConfirm.className = isDanger ? "btn-danger" : "btn-confirm";
-      
       modal.classList.add("show");
-      
-      if (inputVal !== undefined) {
-        modalInput.focus();
-        modalInput.select();
-      } else {
-        modalConfirm.focus();
-      }
+      if (inputVal !== undefined) { modalInput.focus(); modalInput.select(); }
+      else { modalConfirm.focus(); }
     });
   }
 
   function closeModal(result) {
     modal.classList.remove("show");
-    if (modalResolve) {
-      modalResolve(result);
-      modalResolve = null;
-    }
+    if (modalResolve) { modalResolve(result); modalResolve = null; }
   }
 
   modalCancel.onclick = () => closeModal(null);
@@ -1428,26 +1437,99 @@ textarea::placeholder{color:var(--muted)}
 
   const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const inl = s => s.replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>").replace(/(^|[^*])\*([^*\s][^*]*)\*/g, "$1<em>$2</em>");
+
+  // ============ MARKDOWN + MATH RENDERER ============
   function md(src) {
-    const blocks = [];
-    let s = esc(src).replace(/```(\w*)\n?([\s\S]*?)(```|$)/g, (_, l, c) => {
-      blocks.push('<div class="code"><div class="cbar"><span>' + (l || "kode") + '</span><button type="button" data-cc>Salin</button></div><pre><code>' + c.replace(/\n$/, "") + "</code></pre></div>");
-      return "\u0000" + (blocks.length - 1) + "\u0000";
+    const codeBlocks = [];
+    const mathBlocks = [];
+
+    // 1. Escape HTML dulu
+    let s = esc(src);
+
+    // 2. Ekstrak code block ```...``` (paling prioritas)
+    s = s.replace(/```(\w*)\n?([\s\S]*?)(```|$)/g, (_, lang, code) => {
+      codeBlocks.push({ lang: lang || "kode", code: code.replace(/\n$/, "") });
+      return `\u0000C${codeBlocks.length - 1}C\u0000`;
     });
+
+    // 3. Ekstrak display math $$...$$ dan \[...\]
+    s = s.replace(/\$\$([\s\S]+?)\$\$/g, (_, m) => {
+      mathBlocks.push({ display: true, tex: m.trim() });
+      return `\u0000M${mathBlocks.length - 1}M\u0000`;
+    });
+    s = s.replace(/\\\[([\s\S]+?)\\\]/g, (_, m) => {
+      mathBlocks.push({ display: true, tex: m.trim() });
+      return `\u0000M${mathBlocks.length - 1}M\u0000`;
+    });
+
+    // 4. Ekstrak inline math $...$ dan \(...\)
+    //    Regex: opening $ bukan diikuti spasi/$, closing $ bukan didahului spasi/$
+    s = s.replace(/(^|[^\\$])\$(?![\s$])([^$\n]*[^\s$])\$(?!\$)/g, (_, prefix, m) => {
+      mathBlocks.push({ display: false, tex: m.trim() });
+      return prefix + `\u0000M${mathBlocks.length - 1}M\u0000`;
+    });
+    s = s.replace(/\\\(([\s\S]+?)\\\)/g, (_, m) => {
+      mathBlocks.push({ display: false, tex: m.trim() });
+      return `\u0000M${mathBlocks.length - 1}M\u0000`;
+    });
+
+    // 5. Proses markdown baris-per-baris
     let out = "", para = [], ls = null;
     const fp = () => { if (para.length) { out += "<p>" + para.join("<br>") + "</p>"; para = []; } };
     const fl = () => { if (ls) { out += "</" + ls + ">"; ls = null; } };
     for (const line of s.split("\n")) {
       let m;
-      if ((m = line.match(/^\u0000(\d+)\u0000$/))) { fp(); fl(); out += blocks[+m[1]]; }
-      else if ((m = line.match(/^\s*[-*]\s+(.*)/))) { fp(); if (ls !== "ul") { fl(); out += "<ul>"; ls = "ul"; } out += "<li>" + inl(m[1]) + "</li>"; }
-      else if ((m = line.match(/^\s*\d+[.)]\s+(.*)/))) { fp(); if (ls !== "ol") { fl(); out += "<ol>"; ls = "ol"; } out += "<li>" + inl(m[1]) + "</li>"; }
-      else if ((m = line.match(/^#{1,4}\s+(.*)/))) { fp(); fl(); out += "<h3>" + inl(m[1]) + "</h3>"; }
-      else if (!line.trim()) { fp(); fl(); }
-      else { fl(); para.push(inl(line)); }
+      if ((m = line.match(/^\u0000[CM]\d+[CM]\u0000$/))) {
+        fp(); fl(); out += line;
+      } else if ((m = line.match(/^\s*[-*]\s+(.*)/))) {
+        fp(); if (ls !== "ul") { fl(); out += "<ul>"; ls = "ul"; }
+        out += "<li>" + inl(m[1]) + "</li>";
+      } else if ((m = line.match(/^\s*\d+[.)]\s+(.*)/))) {
+        fp(); if (ls !== "ol") { fl(); out += "<ol>"; ls = "ol"; }
+        out += "<li>" + inl(m[1]) + "</li>";
+      } else if ((m = line.match(/^#{1,4}\s+(.*)/))) {
+        fp(); fl(); out += "<h3>" + inl(m[1]) + "</h3>";
+      } else if (!line.trim()) {
+        fp(); fl();
+      } else {
+        fl(); para.push(inl(line));
+      }
     }
     fp(); fl();
-    return out.replace(/\u0000(\d+)\u0000/g, (_, i) => blocks[+i]);
+
+    // 6. Restore code blocks
+    out = out.replace(/\u0000C(\d+)C\u0000/g, (_, i) => {
+      const b = codeBlocks[+i];
+      return `<div class="code"><div class="cbar"><span>${b.lang}</span><button type="button" data-cc>Salin</button></div><pre><code>${b.code}</code></pre></div>`;
+    });
+
+    // 7. Restore math blocks (span kosong, dirender oleh KaTeX nanti)
+    out = out.replace(/\u0000M(\d+)M\u0000/g, (_, i) => {
+      const mb = mathBlocks[+i];
+      const attr = mb.tex.replace(/"/g, "&quot;").replace(/\n/g, "&#10;");
+      return `<span class="math-${mb.display ? "display" : "inline"}" data-tex="${attr}"></span>`;
+    });
+
+    return out;
+  }
+
+  // ============ KATEX RENDERER ============
+  function renderMath(container) {
+    if (typeof katex === "undefined" || !container) return;
+    container.querySelectorAll(".math-inline, .math-display").forEach(el => {
+      if (el.dataset.rendered === "1") return;
+      const tex = el.getAttribute("data-tex") || el.textContent || "";
+      if (!tex.trim()) return;
+      try {
+        katex.render(tex, el, {
+          displayMode: el.classList.contains("math-display"),
+          throwOnError: false,
+          strict: "ignore",
+          output: "html"
+        });
+        el.dataset.rendered = "1";
+      } catch (_) { /* biarkan tampil sebagai teks biasa jika gagal */ }
+    });
   }
 
   function toEnd(force) {
@@ -1478,10 +1560,8 @@ textarea::placeholder{color:var(--muted)}
   function userRow(m) {
     const wrap = document.createElement("div");
     wrap.className = "u-wrap";
-
     const u = document.createElement("div"); u.className = "u";
     if (m.text) { u.textContent = m.text; wrap.appendChild(u); }
-
     if (m.images && m.images.length) {
       const imgs = document.createElement("div"); imgs.className = "msg-imgs";
       m.images.forEach(img => {
@@ -1492,12 +1572,10 @@ textarea::placeholder{color:var(--muted)}
       });
       wrap.appendChild(imgs);
     }
-
     if (m.ts) {
       const ts = document.createElement("div"); ts.className = "ts"; ts.textContent = fmtTime(m.ts);
       wrap.appendChild(ts);
     }
-
     const acts = document.createElement("div"); acts.className = "u-acts";
     const cp = document.createElement("button"); cp.type = "button"; cp.textContent = "Salin";
     cp.onclick = async () => {
@@ -1509,7 +1587,6 @@ textarea::placeholder{color:var(--muted)}
     ed.onclick = () => startEdit(m, wrap);
     acts.append(cp, ed);
     wrap.appendChild(acts);
-
     log.appendChild(wrap);
     return wrap;
   }
@@ -1522,6 +1599,7 @@ textarea::placeholder{color:var(--muted)}
       p.innerHTML = '<div class="typing" aria-label="Mengetik"><i></i><i></i><i></i></div>';
     } else {
       p.innerHTML = md(m.text);
+      renderMath(p);
       const c = active();
       const isLast = c && c.msgs.length && c.msgs[c.msgs.length - 1] === m;
       const a = document.createElement("div"); a.className = "acts";
@@ -1556,14 +1634,12 @@ textarea::placeholder{color:var(--muted)}
     const acts = wrap.querySelector(".u-acts");
     const original = m.text || "";
     if (acts) acts.style.display = "none";
-
     const box = document.createElement("div"); box.className = "edit-box";
     box.innerHTML = '<textarea></textarea><div class="edit-btns"><button type="button" data-cancel>Batal</button><button type="button" data-save>Simpan & kirim</button></div>';
     const ta = box.querySelector("textarea");
     ta.value = original;
     u.innerHTML = ""; u.appendChild(box);
     ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length);
-
     const restore = () => { u.textContent = original; if (acts) acts.style.display = ""; };
     box.querySelector("[data-cancel]").onclick = restore;
     box.querySelector("[data-save]").onclick = () => {
@@ -1616,34 +1692,23 @@ textarea::placeholder{color:var(--muted)}
   function makeItem(c) {
     const row = document.createElement("div");
     row.className = "item" + (c.id === cur ? " on" : "");
-
     const t = document.createElement("button"); t.type = "button"; t.className = "t";
     t.textContent = c.title; t.title = c.title;
     t.onclick = () => { if (busy) ctl?.abort(); cur = c.id; persist(); drawAll(); closeSide(); };
-
     const acts = document.createElement("div"); acts.className = "acts-side";
-
     const pn = document.createElement("button"); pn.type = "button";
     pn.innerHTML = PIN;
     pn.setAttribute("aria-label", c.pinned ? "Lepas sematan" : "Sematkan");
     pn.title = c.pinned ? "Lepas sematan" : "Sematkan";
     if (c.pinned) pn.classList.add("pin-on");
     pn.onclick = (e) => { e.stopPropagation(); c.pinned = !c.pinned; persist(); drawList(); };
-
     const rn = document.createElement("button"); rn.type = "button";
     rn.innerHTML = RENAME; rn.setAttribute("aria-label", "Ganti nama"); rn.title = "Ganti nama";
     rn.onclick = async (e) => {
       e.stopPropagation();
-      const nt = await showModal({
-        title: "Ganti Nama",
-        inputVal: c.title,
-        confirmText: "Simpan"
-      });
-      if (nt !== null && nt.trim()) {
-        c.title = nt.trim(); persist(); drawAll();
-      }
+      const nt = await showModal({ title: "Ganti Nama", inputVal: c.title, confirmText: "Simpan" });
+      if (nt !== null && nt.trim()) { c.title = nt.trim(); persist(); drawAll(); }
     };
-
     const x = document.createElement("button"); x.type = "button"; x.className = "del";
     x.innerHTML = TRASH; x.setAttribute("aria-label", "Hapus obrolan"); x.title = "Hapus";
     x.onclick = async (e) => {
@@ -1658,7 +1723,6 @@ textarea::placeholder{color:var(--muted)}
       if (c.id === cur) { if (busy) ctl?.abort(); cur = ""; }
       convs = convs.filter(v => v.id !== c.id); persist(); drawAll();
     };
-
     acts.append(pn, rn, x);
     row.append(t, acts);
     return row;
@@ -1672,16 +1736,13 @@ textarea::placeholder{color:var(--muted)}
       list.innerHTML = '<div class="none">' + (q ? "Tidak ada obrolan yang cocok." : "Belum ada obrolan. Mulai tanya Elara, nanti muncul di sini.") + "</div>";
       return;
     }
-
     const pinned = items.filter(c => c.pinned).sort((a, b) => (b.t || +b.id) - (a.t || +a.id));
     const rest = items.filter(c => !c.pinned).sort((a, b) => (b.t || +b.id) - (a.t || +a.id));
-
     if (pinned.length) {
       const h = document.createElement("div"); h.className = "grp"; h.textContent = "📌 Disematkan";
       list.appendChild(h);
       pinned.forEach(c => list.appendChild(makeItem(c)));
     }
-
     let last = "";
     rest.forEach(c => {
       const g = grp(c.t || +c.id);
@@ -1700,9 +1761,7 @@ textarea::placeholder{color:var(--muted)}
     if (!c || !c.msgs.length) {
       const h = document.createElement("div"); h.className = "hero";
       h.innerHTML = "<h1>Halo! Aku <em>Elara</em>, asisten AI pribadi kamu.</h1><p>Aku siap membantu menjawab pertanyaan, mencari informasi, berdiskusi, dan menemukan solusi untuk berbagai hal. Apa yang ingin kamu lakukan hari ini?</p>";
-      
       const g = document.createElement("div"); g.className = "grid";
-      // Ambil 3 prompt secara acak
       const randomIdeas = getRandomIdeas(3);
       randomIdeas.forEach(([k, t]) => {
         const b = document.createElement("button"); b.type = "button"; b.className = "card";
@@ -1796,11 +1855,11 @@ textarea::placeholder{color:var(--muted)}
     toEnd(true);
 
     input.value = ""; pendingAttachments = []; drawAttachments(); fit(); setBusy(true);
-    input.blur(); // tutup keyboard di mobile agar user bisa baca jawaban dengan tenang
+    input.blur();
     ctl = new AbortController();
 
     let acc = "", raf = 0;
-    const paint = () => { raf = 0; p.innerHTML = md(acc); toEnd(); };
+    const paint = () => { raf = 0; p.innerHTML = md(acc); renderMath(p); toEnd(); };
 
     try {
       const body = JSON.stringify({
@@ -1851,8 +1910,6 @@ textarea::placeholder{color:var(--muted)}
     } finally {
       if (raf) cancelAnimationFrame(raf);
       persist(); ctl = null; setBusy(false); toEnd();
-      // sengaja TIDAK auto-focus input di sini supaya keyboard tidak terbuka sendiri
-      // biar user bisa baca jawaban Elara dengan tenang
     }
   }
 
