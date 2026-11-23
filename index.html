@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Elara · Asisten AI Pribadi</title>
+<style>
+:root{
+  --bg:#0f1311; --side:#0b0e0c; --surface:#171c19; --ink:#e9eee9; --muted:#8d978f; --line:#252c27;
+  --accent:#c6f26b; --accent-ink:#12190a; --err:#ff8a80; --code:#0a0d0b;
+  --serif:"Iowan Old Style","Palatino Linotype",Georgia,serif;
+  color-scheme:dark;
+}
+:root[data-theme="light"]{
+  --bg:#f5f3ec; --side:#ece9df; --surface:#ffffff; --ink:#1b211d; --muted:#6a736c; --line:#dcd8cc;
+  --accent:#2f6b0f; --accent-ink:#ffffff; --err:#b42318; --code:#1b211d; color-scheme:light;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.65 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
+  height:100dvh;display:flex;overflow:hidden}
+button,textarea,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+textarea:focus-visible,input:focus-visible{outline:none}
+
+/* Sidebar */
+aside{width:288px;background:var(--side);border-right:1px solid var(--line);display:flex;flex-direction:column;flex:none;padding:calc(18px + env(safe-area-inset-top,0)) 14px 14px;transition:transform .25s}
+.av{width:30px;height:30px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-family:var(--serif);font-weight:600;font-size:15px;flex:none}
+.logo{display:flex;align-items:center;gap:10px;padding:2px 6px 18px}
+.logo .av{width:36px;height:36px;font-size:18px}
+.logo b{display:block;font-family:var(--serif);font-size:22px;font-weight:500;line-height:1.1}
+.logo small{display:block;font-size:12px;color:var(--muted)}
+.newbtn{width:100%;padding:11px 14px;border-radius:12px;border:none;background:var(--accent);color:var(--accent-ink);font-weight:600}
+.newbtn:hover{filter:brightness(1.08)}
+.search{margin:14px 0 2px}
+.search input{width:100%;background:var(--surface);border:1px solid transparent;border-radius:10px;padding:9px 12px;font:inherit;font-size:14px;color:var(--ink);outline:none}
+.search input:focus{border-color:var(--accent)}
+.search input::placeholder{color:var(--muted)}
+#list{flex:1;overflow-y:auto;margin:0 -6px;padding:0 6px}
+.grp{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:16px 8px 6px}
+.item{position:relative;display:flex;align-items:center;border-radius:10px}
+.item .t{flex:1;min-width:0;background:none;border:none;text-align:left;padding:9px 92px 9px 12px;border-radius:10px;color:var(--ink);opacity:.75;font-size:14px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item:hover,.item.on{background:var(--surface)}
+.item.on .t{opacity:1;font-weight:600}
+.item.on::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:3px;border-radius:2px;background:var(--accent)}
+.item .acts-side{position:absolute;right:4px;top:50%;transform:translateY(-50%);display:flex;gap:2px;opacity:0;transition:opacity .15s}
+.item:hover .acts-side,.item:focus-within .acts-side{opacity:1}
+.item .acts-side button{width:26px;height:26px;border:none;background:none;color:var(--muted);border-radius:6px;display:grid;place-items:center}
+.item .acts-side button:hover{color:var(--accent);background:var(--bg)}
+.item .acts-side button.del:hover{color:var(--err)}
+.item .acts-side button.pin-on{color:var(--accent)}
+.item .acts-side svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+@media (hover:none){.item .acts-side{opacity:.85}}
+.none{color:var(--muted);font-size:13px;padding:14px 8px;line-height:1.55}
+
+/* Main */
+.pane{flex:1;display:flex;flex-direction:column;min-width:0}
+header{display:flex;align-items:center;gap:10px;padding:calc(10px + env(safe-area-inset-top,0)) 16px 10px;border-bottom:1px solid var(--line)}
+header h2{font-size:14px;font-weight:600;margin-right:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted)}
+.ib{width:36px;height:36px;border-radius:9px;border:1px solid var(--line);background:none;display:grid;place-items:center}
+.ib:hover{border-color:var(--accent);color:var(--accent)}
+.ib svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#menu{display:none}
+main{flex:1;overflow-y:auto;position:relative}
+#log{max-width:740px;margin:0 auto;padding:28px 18px 16px;display:flex;flex-direction:column;gap:22px}
+
+/* User message */
+.u-wrap{align-self:flex-end;max-width:82%;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.u{background:var(--surface);border:1px solid var(--line);padding:10px 15px;border-radius:16px 16px 4px 16px;white-space:pre-wrap;overflow-wrap:anywhere;max-width:100%}
+.u-acts{display:flex;gap:6px;opacity:0;transition:opacity .15s;align-items:center}
+.u-wrap:hover .u-acts,.u-wrap:focus-within .u-acts{opacity:1}
+@media (hover:none){.u-acts{opacity:.9}}
+.u-acts button{background:none;border:1px solid var(--line);border-radius:6px;color:var(--muted);font-size:11px;padding:2px 8px}
+.u-acts button:hover{color:var(--accent);border-color:var(--accent)}
+
+/* Bot message */
+.b{display:flex;gap:12px}
+.body{min-width:0;flex:1}
+.who{font-size:13px;font-weight:600;margin:4px 0 2px}
+.prose{min-width:0;flex:1;overflow-wrap:anywhere}
+.prose>*+*{margin-top:10px}
+.prose h3{font-family:var(--serif);font-size:18px;margin-top:18px}
+.prose ul,.prose ol{padding-left:22px}
+.prose li+li{margin-top:3px}
+.prose code{background:var(--surface);border:1px solid var(--line);padding:1px 6px;border-radius:5px;font:13px ui-monospace,Consolas,monospace}
+.code{border-radius:10px;overflow:hidden;background:var(--code);color:#e9eee9;border:1px solid var(--line)}
+.cbar{display:flex;justify-content:space-between;align-items:center;padding:6px 12px;font-size:12px;color:#8d978f;border-bottom:1px solid #252c27}
+.cbar button{background:none;border:1px solid #2c342e;border-radius:6px;color:inherit;font-size:12px;padding:2px 9px}
+.cbar button:hover{color:#c6f26b;border-color:#c6f26b}
+.code pre{padding:12px;overflow-x:auto}
+.code pre code{background:none;border:none;padding:0;color:inherit}
+
+.acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.acts button{
+  background:none;border:1px solid var(--line);border-radius:8px;
+  color:var(--muted);font-size:12px;padding:6px 12px;
+  transition:border-color .15s,color .15s;
+}
+.acts button:hover{color:var(--accent);border-color:var(--accent)}
+
+/* Timestamp */
+.ts{font-size:11px;color:var(--muted);margin-top:6px;opacity:.75;letter-spacing:.01em}
+.u-wrap .ts{margin-top:2px;margin-right:4px}
+
+/* Gambar dalam pesan */
+.msg-imgs{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.msg-imgs img{max-width:180px;max-height:180px;border-radius:8px;border:1px solid var(--line);cursor:zoom-in;object-fit:cover}
+
+/* Edit box */
+.edit-box textarea{width:100%;background:var(--bg);border:1px solid var(--accent);border-radius:8px;padding:8px 10px;color:var(--ink);font:inherit;resize:vertical;min-height:64px;line-height:1.5}
+.edit-btns{display:flex;gap:6px;margin-top:8px;justify-content:flex-end}
+.edit-btns button{background:none;border:1px solid var(--line);border-radius:6px;color:var(--muted);font-size:12px;padding:5px 12px}
+.edit-btns button[data-save]{background:var(--accent);color:var(--accent-ink);border:none;font-weight:600}
+
+/* Typing */
+.typing{display:flex;gap:5px;padding:6px 0}
+.typing i{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:b 1s infinite ease-in-out}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes b{0%,80%,100%{opacity:.3}40%{opacity:1}}
+.note{color:var(--muted);font-size:13px}
+.err{border:1px solid var(--err);color:var(--err);border-radius:10px;padding:10px 14px;font-size:14px;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.err button{background:none;border:1px solid currentColor;color:inherit;border-radius:8px;padding:4px 12px}
+
+/* Hero */
+.hero{padding-top:8vh}
+.hero h1{font-family:var(--serif);font-weight:400;font-size:clamp(30px,5.4vw,46px);line-height:1.08;letter-spacing:-.02em;max-width:14em}
+.hero h1 em{font-style:italic;color:var(--accent)}
+.hero p{color:var(--muted);margin-top:14px;max-width:32em}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:30px}
+.card{display:flex;flex-direction:column;gap:6px;text-align:left;background:none;border:1px solid var(--line);border-radius:12px;padding:14px;min-height:92px}
+.card:hover{border-color:var(--accent);background:var(--surface)}
+.card small{color:var(--accent);font-size:12px;font-weight:700;letter-spacing:.06em}
+
+/* Composer */
+footer{padding:6px 18px calc(16px + env(safe-area-inset-bottom,0));background:linear-gradient(to top,var(--bg) 60%,transparent)}
+.attach-row{max-width:740px;margin:0 auto 8px;display:none;gap:8px;flex-wrap:wrap}
+.attach-row.show{display:flex}
+.attach{position:relative;width:64px;height:64px;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:var(--surface)}
+.attach img{width:100%;height:100%;object-fit:cover;display:block}
+.attach button{position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;border:none;background:rgba(0,0,0,.75);color:#fff;font-size:14px;display:grid;place-items:center;padding:0;line-height:1}
+.attach button:hover{background:var(--err)}
+.box{max-width:740px;margin:0 auto;display:flex;align-items:flex-end;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:28px;padding:6px;box-shadow:0 10px 30px rgba(0,0,0,.28);transition:border-color .2s}
+:root[data-theme="light"] .box{box-shadow:0 10px 28px rgba(40,50,30,.12)}
+.box:focus-within{border-color:var(--accent)}
+#attach{width:40px;height:40px;border-radius:50%;border:none;background:none;color:var(--muted);display:grid;place-items:center;flex:none;transition:color .15s}
+#attach:hover{color:var(--accent)}
+#attach svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+textarea{flex:1;background:none;border:none;outline:none;resize:none;max-height:170px;padding:10px 4px;line-height:1.5;font-size:16px}
+textarea::placeholder{color:var(--muted)}
+#send{width:44px;height:44px;border-radius:50%;border:none;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;flex:none;transition:transform .15s}
+#send:not(:disabled):hover{transform:scale(1.06)}
+#send:disabled{opacity:.3;cursor:not-allowed}
+#send svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.hint{max-width:740px;margin:8px auto 0;text-align:center;font-size:12px;color:var(--muted)}
+
+/* Scroll to bottom */
+.scroll-btn{position:fixed;right:24px;bottom:calc(96px + env(safe-area-inset-bottom,0));width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);display:none;place-items:center;z-index:5;box-shadow:0 4px 14px rgba(0,0,0,.35)}
+.scroll-btn.show{display:grid}
+.scroll-btn:hover{border-color:var(--accent);color:var(--accent)}
+.scroll-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* Lightbox */
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.92);display:grid;place-items:center;z-index:100;padding:24px;cursor:zoom-out}
+.lightbox img{max-width:100%;max-height:100%;border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+
+.scrim{display:none}
+@media (max-width:760px){
+  aside{position:fixed;inset:0 auto 0 0;z-index:20;transform:translateX(-100%);width:min(82vw,300px)}
+  body.open aside{transform:none}
+  body.open .scrim{display:block;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10}
+  #menu{display:grid}
+  .grid{grid-template-columns:1fr}
+  .card{min-height:0}
+  .hint{display:none}
+  .scroll-btn{right:16px;bottom:calc(90px + env(safe-area-inset-bottom,0))}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<aside id="side">
+  <div class="logo"><span class="av" aria-hidden="true">E</span><div><b>Elara</b><small>Asisten pribadimu</small></div></div>
+  <button class="newbtn" id="new" type="button">+ Obrolan baru</button>
+  <div class="search"><input id="q" type="search" placeholder="Cari obrolan…" aria-label="Cari obrolan" autocomplete="off" /></div>
+  <div id="list"></div>
+</aside>
+<div class="scrim" id="scrim"></div>
+
+<div class="pane">
+  <header>
+    <button class="ib" id="menu" type="button" aria-label="Buka riwayat"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <h2 id="title">Obrolan baru</h2>
+    <button class="ib" id="theme" type="button" aria-label="Ganti tema"><svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+  </header>
+  <main id="main"><div id="log" role="log" aria-live="polite"></div></main>
+  <footer>
+    <div class="attach-row" id="attachRow"></div>
+    <form class="box" id="form">
+      <button type="button" id="attach" aria-label="Lampirkan gambar">
+        <svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+      </button>
+      <input type="file" id="file" accept="image/*" multiple hidden />
+      <textarea id="input" rows="1" placeholder="Tanya Elara apa saja…" aria-label="Pesan"></textarea>
+      <button id="send" type="submit" aria-label="Kirim"></button>
+    </form>
+    <p class="hint">Enter kirim · Shift+Enter baris baru · 📎 lampirkan gambar</p>
+  </footer>
+</div>
+
+<button class="scroll-btn" id="scrollBtn" type="button" aria-label="Ke pesan terbaru">
+  <svg viewBox="0 0 24 24"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+</button>
+
+<script>
+(() => {
+  const API_KEY = "AQ.Ab8RN6IzbGThaVmaT87QlO4OsFQXq4juAQR_QvF-l4EV3Qio6A";
+  const MODEL = "gemini-3.5-flash-lite";
+  const SYSTEM = [
+    "Kamu adalah Elara, asisten AI pribadi perempuan. Gunakan sapaan 'aku' untuk dirimu dan 'kamu' untuk pengguna.",
+    "Kepribadian: cerdas, tenang, dan berwawasan luas; ramah, sopan, dan komunikatif; punya pembawaan elegan dan profesional; mampu berpikir kritis dan analitis; kreatif dalam memberi solusi; tidak kaku dan tidak terdengar seperti robot.",
+    "Gaya komunikasi: selalu gunakan bahasa Indonesia yang natural dan sesuaikan gaya bahasa dengan pengguna. Utamakan jawaban yang jelas, akurat, dan mudah dipahami. Jangan memakai kalimat pembuka yang berulang-ulang. Jangan bertele-tele untuk pertanyaan sederhana. Tetap sopan tanpa terlalu formal.",
+    "Jika ditanya siapa kamu, perkenalkan dirimu sebagai Elara. Jika ditanya dengan jujur apakah kamu manusia, akui bahwa kamu asisten AI."
+  ].join("\n");
+  const URL_ = "https://generativelanguage.googleapis.com/v1beta/models/" + MODEL + ":streamGenerateContent?alt=sse";
+  const IDEAS = [
+    ["PENJELASAN", "Jelaskan cara kerja internet dengan bahasa sederhana"],
+    ["BELAJAR", "Buatkan rencana belajar JavaScript selama 30 hari"],
+    ["MENULIS", "Bantu saya menulis email izin tidak masuk kerja"],
+    ["IDE", "Beri 5 ide usaha kecil dengan modal di bawah 5 juta"]
+  ];
+  const SEND = '<svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
+  const STOP = '<svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>';
+  const PIN = '<svg viewBox="0 0 24 24"><path d="M9 4h6l-1.5 6.5L18 14h-5v7l-1-7H7l4.5-3.5L9 4z"/></svg>';
+  const RENAME = '<svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>';
+  const TRASH = '<svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12M9 7V4h6v3"/></svg>';
+
+  const $ = id => document.getElementById(id);
+  const log = $("log"), main = $("main"), input = $("input"), send = $("send"), list = $("list"), scrollBtn = $("scrollBtn");
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : v; } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, v); return true; } catch { return false; } }
+  };
+
+  let convs = [];
+  try { convs = JSON.parse(store.get("gv2_convs", "[]")) || []; } catch { convs = []; }
+  let cur = store.get("gv2_cur", "");
+  if (!convs.some(c => c.id === cur)) cur = "";
+  // Migrasi: pastikan setiap pesan punya ts
+  convs.forEach(c => (c.msgs || []).forEach(m => { if (!m.ts) m.ts = c.t || +c.id || Date.now(); }));
+
+  let busy = false, ctl = null;
+  let autoScroll = true;
+  let pendingAttachments = [];
+
+  const active = () => convs.find(c => c.id === cur);
+  function persist() {
+    const payload = JSON.stringify(convs.slice(0, 40));
+    if (!store.set("gv2_convs", payload)) {
+      // Quota penuh: coba strip gambar dari pesan lama
+      const stripped = convs.slice(0, 40).map(c => ({
+        ...c,
+        msgs: c.msgs.map((m, i, arr) => (i < arr.length - 2 && m.images) ? { ...m, images: undefined } : m)
+      }));
+      store.set("gv2_convs", JSON.stringify(stripped));
+    }
+    store.set("gv2_cur", cur);
+  }
+
+  /* Tema */
+  const setTheme = t => document.documentElement.setAttribute("data-theme", t);
+  const savedTheme = store.get("gv2_theme", "");
+  if (savedTheme) setTheme(savedTheme);
+  else setTheme(matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+  $("theme").onclick = () => {
+    const t = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    setTheme(t); store.set("gv2_theme", t);
+  };
+
+  /* Sidebar mobile */
+  const closeSide = () => document.body.classList.remove("open");
+  $("menu").onclick = () => document.body.classList.add("open");
+  $("scrim").onclick = closeSide;
+
+  /* Waktu */
+  function fmtTime(ts) {
+    if (!ts) return "";
+    const d = new Date(ts), now = new Date();
+    const sameDay = d.toDateString() === now.toDateString();
+    const hm = d.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+    if (sameDay) return hm;
+    const y = new Date(now); y.setDate(y.getDate() - 1);
+    if (d.toDateString() === y.toDateString()) return "Kemarin " + hm;
+    return d.toLocaleDateString("id-ID", { day: "numeric", month: "short" }) + " " + hm;
+  }
+
+  /* Markdown ringan */
+  const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const inl = s => s.replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>").replace(/(^|[^*])\*([^*\s][^*]*)\*/g, "$1<em>$2</em>");
+  function md(src) {
+    const blocks = [];
+    let s = esc(src).replace(/```(\w*)\n?([\s\S]*?)(```|$)/g, (_, l, c) => {
+      blocks.push('<div class="code"><div class="cbar"><span>' + (l || "kode") + '</span><button type="button" data-cc>Salin</button></div><pre><code>' + c.replace(/\n$/, "") + "</code></pre></div>");
+      return "\u0000" + (blocks.length - 1) + "\u0000";
+    });
+    let out = "", para = [], ls = null;
+    const fp = () => { if (para.length) { out += "<p>" + para.join("<br>") + "</p>"; para = []; } };
+    const fl = () => { if (ls) { out += "</" + ls + ">"; ls = null; } };
+    for (const line of s.split("\n")) {
+      let m;
+      if ((m = line.match(/^\u0000(\d+)\u0000$/))) { fp(); fl(); out += blocks[+m[1]]; }
+      else if ((m = line.match(/^\s*[-*]\s+(.*)/))) { fp(); if (ls !== "ul") { fl(); out += "<ul>"; ls = "ul"; } out += "<li>" + inl(m[1]) + "</li>"; }
+      else if ((m = line.match(/^\s*\d+[.)]\s+(.*)/))) { fp(); if (ls !== "ol") { fl(); out += "<ol>"; ls = "ol"; } out += "<li>" + inl(m[1]) + "</li>"; }
+      else if ((m = line.match(/^#{1,4}\s+(.*)/))) { fp(); fl(); out += "<h3>" + inl(m[1]) + "</h3>"; }
+      else if (!line.trim()) { fp(); fl(); }
+      else { fl(); para.push(inl(line)); }
+    }
+    fp(); fl();
+    return out.replace(/\u0000(\d+)\u0000/g, (_, i) => blocks[+i]);
+  }
+
+  /* Scroll */
+  function toEnd(force) {
+    if (force || autoScroll) main.scrollTop = main.scrollHeight;
+  }
+  main.addEventListener("scroll", () => {
+    const dist = main.scrollHeight - main.scrollTop - main.clientHeight;
+    const next = dist < 80;
+    if (next !== autoScroll) {
+      autoScroll = next;
+      scrollBtn.classList.toggle("show", !autoScroll);
+    }
+  });
+  scrollBtn.onclick = () => { autoScroll = true; scrollBtn.classList.remove("show"); toEnd(true); };
+
+  /* Lightbox */
+  function showLightbox(src) {
+    const ov = document.createElement("div");
+    ov.className = "lightbox";
+    const img = document.createElement("img"); img.src = src; img.alt = "";
+    ov.appendChild(img);
+    const close = () => { ov.remove(); document.removeEventListener("keydown", onKey); };
+    const onKey = e => { if (e.key === "Escape") close(); };
+    ov.onclick = close;
+    document.addEventListener("keydown", onKey);
+    document.body.appendChild(ov);
+  }
+
+  /* Render pesan */
+  function userRow(m) {
+    const wrap = document.createElement("div");
+    wrap.className = "u-wrap";
+
+    const u = document.createElement("div"); u.className = "u";
+    if (m.text) { u.textContent = m.text; wrap.appendChild(u); }
+
+    if (m.images && m.images.length) {
+      const imgs = document.createElement("div"); imgs.className = "msg-imgs";
+      m.images.forEach(img => {
+        const el = document.createElement("img");
+        el.src = "data:" + img.mime + ";base64," + img.data;
+        el.onclick = () => showLightbox(el.src);
+        imgs.appendChild(el);
+      });
+      wrap.appendChild(imgs);
+    }
+
+    if (m.ts) {
+      const ts = document.createElement("div"); ts.className = "ts"; ts.textContent = fmtTime(m.ts);
+      wrap.appendChild(ts);
+    }
+
+    const acts = document.createElement("div"); acts.className = "u-acts";
+    const cp = document.createElement("button"); cp.type = "button"; cp.textContent = "Salin";
+    cp.onclick = async () => {
+      try { await navigator.clipboard.writeText(m.text || ""); cp.textContent = "Tersalin"; }
+      catch { cp.textContent = "Gagal"; }
+      setTimeout(() => cp.textContent = "Salin", 1400);
+    };
+    const ed = document.createElement("button"); ed.type = "button"; ed.textContent = "Edit";
+    ed.onclick = () => startEdit(m, wrap);
+    acts.append(cp, ed);
+    wrap.appendChild(acts);
+
+    log.appendChild(wrap);
+    return wrap;
+  }
+
+  function botRow(m) {
+    const d = document.createElement("div"); d.className = "b";
+    d.innerHTML = '<span class="av" aria-hidden="true">E</span><div class="body"><div class="who">Elara</div><div class="prose"></div></div>';
+    const p = d.querySelector(".prose");
+    if (m === null) {
+      p.innerHTML = '<div class="typing" aria-label="Mengetik"><i></i><i></i><i></i></div>';
+    } else {
+      p.innerHTML = md(m.text);
+      const c = active();
+      const isLast = c && c.msgs.length && c.msgs[c.msgs.length - 1] === m;
+      const a = document.createElement("div"); a.className = "acts";
+      const cp = document.createElement("button"); cp.type = "button"; cp.textContent = "Salin jawaban";
+      cp._t = m.text; cp.setAttribute("data-cm", "");
+      a.appendChild(cp);
+      if (isLast) {
+        const rg = document.createElement("button"); rg.type = "button"; rg.textContent = "Ulangi";
+        rg.onclick = () => regenerate();
+        a.appendChild(rg);
+      }
+      p.appendChild(a);
+      if (m.ts) {
+        const ts = document.createElement("div"); ts.className = "ts"; ts.textContent = fmtTime(m.ts);
+        p.appendChild(ts);
+      }
+    }
+    log.appendChild(d);
+    return p;
+  }
+
+  function errRow(msg, retry) {
+    const d = document.createElement("div"); d.className = "err"; d.setAttribute("role", "alert");
+    d.innerHTML = "<span></span>"; d.firstChild.textContent = msg;
+    const b = document.createElement("button"); b.type = "button"; b.textContent = "Coba lagi";
+    b.onclick = () => { d.remove(); submit(retry.text, retry.images); };
+    d.appendChild(b); log.appendChild(d);
+  }
+
+  /* Edit pesan */
+  function startEdit(m, wrap) {
+    const u = wrap.querySelector(".u") || (() => { const el = document.createElement("div"); el.className = "u"; wrap.insertBefore(el, wrap.firstChild); return el; })();
+    const acts = wrap.querySelector(".u-acts");
+    const original = m.text || "";
+    if (acts) acts.style.display = "none";
+
+    const box = document.createElement("div"); box.className = "edit-box";
+    box.innerHTML = '<textarea></textarea><div class="edit-btns"><button type="button" data-cancel>Batal</button><button type="button" data-save>Simpan & kirim</button></div>';
+    const ta = box.querySelector("textarea");
+    ta.value = original;
+    u.innerHTML = ""; u.appendChild(box);
+    ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length);
+
+    const restore = () => { u.textContent = original; if (acts) acts.style.display = ""; };
+    box.querySelector("[data-cancel]").onclick = restore;
+    box.querySelector("[data-save]").onclick = () => {
+      const nt = ta.value.trim();
+      if (!nt && !(m.images && m.images.length)) return;
+      if (nt === original) { restore(); return; }
+      editAndResubmit(m, nt);
+    };
+    ta.addEventListener("keydown", e => {
+      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); box.querySelector("[data-save]").click(); }
+      if (e.key === "Escape") restore();
+    });
+  }
+
+  function editAndResubmit(m, newText) {
+    const c = active();
+    if (!c || busy) return;
+    const idx = c.msgs.indexOf(m);
+    if (idx < 0) return;
+    const imgs = m.images;
+    c.msgs = c.msgs.slice(0, idx);
+    persist();
+    log.innerHTML = "";
+    c.msgs.forEach(x => x.role === "user" ? userRow(x) : botRow(x));
+    submit(newText, imgs);
+  }
+
+  function regenerate() {
+    const c = active();
+    if (!c || busy) return;
+    let lastUserIdx = -1;
+    for (let i = c.msgs.length - 1; i >= 0; i--) {
+      if (c.msgs[i].role === "user") { lastUserIdx = i; break; }
+    }
+    if (lastUserIdx < 0) return;
+    const lastUser = c.msgs[lastUserIdx];
+    c.msgs = c.msgs.slice(0, lastUserIdx);
+    persist();
+    log.innerHTML = "";
+    c.msgs.forEach(x => x.role === "user" ? userRow(x) : botRow(x));
+    submit(lastUser.text, lastUser.images);
+  }
+
+  /* Sidebar list */
+  function grp(t) {
+    const day = x => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+    const d = Math.round((day(new Date()) - day(new Date(t))) / 864e5);
+    return d <= 0 ? "Hari ini" : d === 1 ? "Kemarin" : d < 8 ? "7 hari terakhir" : "Lebih lama";
+  }
+
+  function makeItem(c) {
+    const row = document.createElement("div");
+    row.className = "item" + (c.id === cur ? " on" : "");
+
+    const t = document.createElement("button"); t.type = "button"; t.className = "t";
+    t.textContent = c.title; t.title = c.title;
+    t.onclick = () => { if (busy) ctl?.abort(); cur = c.id; persist(); drawAll(); closeSide(); };
+
+    const acts = document.createElement("div"); acts.className = "acts-side";
+
+    const pn = document.createElement("button"); pn.type = "button";
+    pn.innerHTML = PIN;
+    pn.setAttribute("aria-label", c.pinned ? "Lepas sematan" : "Sematkan");
+    pn.title = c.pinned ? "Lepas sematan" : "Sematkan";
+    if (c.pinned) pn.classList.add("pin-on");
+    pn.onclick = (e) => { e.stopPropagation(); c.pinned = !c.pinned; persist(); drawList(); };
+
+    const rn = document.createElement("button"); rn.type = "button";
+    rn.innerHTML = RENAME; rn.setAttribute("aria-label", "Ganti nama"); rn.title = "Ganti nama";
+    rn.onclick = (e) => {
+      e.stopPropagation();
+      const nt = prompt("Nama obrolan:", c.title);
+      if (nt !== null && nt.trim()) {
+        c.title = nt.trim(); persist(); drawAll();
+      }
+    };
+
+    const x = document.createElement("button"); x.type = "button"; x.className = "del";
+    x.innerHTML = TRASH; x.setAttribute("aria-label", "Hapus obrolan"); x.title = "Hapus";
+    x.onclick = (e) => {
+      e.stopPropagation();
+      if (!confirm("Hapus obrolan \"" + c.title + "\"?")) return;
+      if (c.id === cur) { if (busy) ctl?.abort(); cur = ""; }
+      convs = convs.filter(v => v.id !== c.id); persist(); drawAll();
+    };
+
+    acts.append(pn, rn, x);
+    row.append(t, acts);
+    return row;
+  }
+
+  function drawList() {
+    list.innerHTML = "";
+    const q = $("q").value.trim().toLowerCase();
+    let items = convs.filter(c => !q || c.title.toLowerCase().includes(q));
+    if (!items.length) {
+      list.innerHTML = '<div class="none">' + (q ? "Tidak ada obrolan yang cocok." : "Belum ada obrolan. Mulai tanya Elara, nanti muncul di sini.") + "</div>";
+      return;
+    }
+
+    const pinned = items.filter(c => c.pinned).sort((a, b) => (b.t || +b.id) - (a.t || +a.id));
+    const rest = items.filter(c => !c.pinned).sort((a, b) => (b.t || +b.id) - (a.t || +a.id));
+
+    if (pinned.length) {
+      const h = document.createElement("div"); h.className = "grp"; h.textContent = "📌 Disematkan";
+      list.appendChild(h);
+      pinned.forEach(c => list.appendChild(makeItem(c)));
+    }
+
+    let last = "";
+    rest.forEach(c => {
+      const g = grp(c.t || +c.id);
+      if (g !== last) {
+        const h = document.createElement("div"); h.className = "grp"; h.textContent = g;
+        list.appendChild(h); last = g;
+      }
+      list.appendChild(makeItem(c));
+    });
+  }
+
+  function drawAll() {
+    drawList(); log.innerHTML = "";
+    const c = active();
+    $("title").textContent = c ? c.title : "Obrolan baru";
+    if (!c || !c.msgs.length) {
+      const h = document.createElement("div"); h.className = "hero";
+      h.innerHTML = "<h1>Halo! Aku <em>Elara</em>, asisten AI pribadi kamu.</h1><p>Aku siap membantu menjawab pertanyaan, mencari informasi, berdiskusi, dan menemukan solusi untuk berbagai hal. Apa yang ingin kamu lakukan hari ini?</p>";
+      const g = document.createElement("div"); g.className = "grid";
+      IDEAS.forEach(([k, t]) => {
+        const b = document.createElement("button"); b.type = "button"; b.className = "card";
+        b.innerHTML = "<small></small><span></span>"; b.firstChild.textContent = k; b.lastChild.textContent = t;
+        b.onclick = () => submit(t); g.appendChild(b);
+      });
+      h.appendChild(g); log.appendChild(h);
+    } else {
+      c.msgs.forEach(m => m.role === "user" ? userRow(m) : botRow(m));
+      autoScroll = true; scrollBtn.classList.remove("show"); toEnd(true);
+    }
+  }
+
+  /* Busy */
+  function setBusy(v) {
+    busy = v;
+    send.innerHTML = v ? STOP : SEND;
+    send.setAttribute("aria-label", v ? "Hentikan" : "Kirim");
+    send.disabled = !v && !input.value.trim() && !pendingAttachments.length;
+  }
+  const mk = t => {
+    if (!t) return "Lampiran";
+    t = t.replace(/\s+/g, " ").trim();
+    return t.length > 38 ? t.slice(0, 36).trim() + "…" : t;
+  };
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+  function why(status, msg, err) {
+    if (status === 400 && /api key/i.test(msg)) return "API key tidak valid.";
+    if (status === 401 || status === 403) return "API key ditolak atau tidak punya akses ke model ini.";
+    if (status === 404) return "Model tidak ditemukan. Periksa nama model di kode.";
+    if (status === 429) {
+      let delay = "";
+      for (const det of (err?.details || [])) {
+        if (det.retryDelay) {
+          const sec = parseFloat(det.retryDelay);
+          if (!isNaN(sec)) { delay = " Tunggu ~" + Math.ceil(sec) + " detik."; break; }
+        }
+      }
+      return "Kuota permintaan tercapai." + delay + (msg && !/quota/i.test(msg) ? " (" + msg + ")" : "");
+    }
+    if (status >= 500) return "Server Elara sedang bermasalah. Coba lagi sebentar.";
+    return msg || "Terjadi kesalahan jaringan. Periksa koneksi internet.";
+  }
+
+  async function openStream(body, signal, onRetry) {
+    for (let i = 0; ; i++) {
+      let res;
+      try {
+        res = await fetch(URL_, { method: "POST", signal, headers: { "Content-Type": "application/json", "x-goog-api-key": API_KEY }, body });
+      } catch (e) {
+        if (e.name === "AbortError") throw e;
+        if (i < 2) { onRetry(); await sleep(1200 * (i + 1)); continue; }
+        throw new Error(why(0, ""));
+      }
+      if (res.ok) return res;
+      const d = await res.json().catch(() => ({}));
+      if ([429, 500, 503].includes(res.status) && i < 2) {
+        // Hormati retryDelay kalau ada
+        let wait = 1500 * (i + 1);
+        for (const det of (d.error?.details || [])) {
+          if (det.retryDelay) {
+            const sec = parseFloat(det.retryDelay);
+            if (!isNaN(sec)) wait = Math.min(sec * 1000, 8000);
+            break;
+          }
+        }
+        onRetry(); await sleep(wait); continue;
+      }
+      throw new Error(why(res.status, d.error?.message || "", d.error));
+    }
+  }
+
+  /* Kirim */
+  async function submit(text, images) {
+    text = (text || "").trim();
+    images = images || [];
+    if ((!text && !images.length) || busy) return;
+
+    let c = active();
+    if (!c) { c = { id: String(Date.now()), title: mk(text), msgs: [] }; convs.unshift(c); cur = c.id; }
+    if (!c.msgs.length) c.title = mk(text);
+
+    const msgImgs = images.length ? images.map(i => ({ mime: i.mime, data: i.data })) : undefined;
+    const userMsg = { role: "user", text, images: msgImgs, ts: Date.now() };
+    c.msgs.push(userMsg);
+    c.t = Date.now();
+    persist(); drawList(); $("title").textContent = c.title;
+    if (document.querySelector(".hero")) log.innerHTML = "";
+    userRow(userMsg);
+
+    const p = botRow(null);
+    autoScroll = true; scrollBtn.classList.remove("show");
+    toEnd(true);
+
+    input.value = ""; pendingAttachments = []; drawAttachments(); fit(); setBusy(true);
+    ctl = new AbortController();
+
+    let acc = "", raf = 0;
+    const paint = () => { raf = 0; p.innerHTML = md(acc); toEnd(); };
+
+    try {
+      const body = JSON.stringify({
+        system_instruction: { parts: [{ text: SYSTEM }] },
+        contents: c.msgs.map(m => {
+          const parts = [];
+          if (m.text) parts.push({ text: m.text });
+          (m.images || []).forEach(img => parts.push({ inline_data: { mime_type: img.mime, data: img.data } }));
+          if (!parts.length) parts.push({ text: "" });
+          return { role: m.role, parts };
+        })
+      });
+      const res = await openStream(body, ctl.signal, () => { p.innerHTML = '<span class="note">Menyambung ulang…</span>'; });
+      const rd = res.body.getReader(), dec = new TextDecoder(); let buf = "", block = "";
+      const eat = line => {
+        if (!line.startsWith("data:")) return;
+        let j; try { j = JSON.parse(line.slice(5)); } catch { return; }
+        if (j.promptFeedback?.blockReason) block = j.promptFeedback.blockReason;
+        for (const part of j.candidates?.[0]?.content?.parts || []) if (part.text && !part.thought) acc += part.text;
+        if (!raf) raf = requestAnimationFrame(paint);
+      };
+      for (;;) {
+        const { done, value } = await rd.read();
+        if (done) break;
+        buf += dec.decode(value, { stream: true });
+        const lines = buf.split("\n"); buf = lines.pop();
+        lines.forEach(eat);
+      }
+      eat(buf.trim());
+      if (!acc.trim()) throw new Error("Elara belum bisa menjawab itu" + (block ? " (" + block + ")" : "") + ". Coba ubah pertanyaan.");
+      p.closest(".b").remove();
+      const botMsg = { role: "model", text: acc, ts: Date.now() };
+      c.msgs.push(botMsg);
+      botRow(botMsg);
+    } catch (e) {
+      p.closest(".b").remove();
+      if (acc.trim()) {
+        const botMsg = { role: "model", text: acc, ts: Date.now() };
+        c.msgs.push(botMsg); botRow(botMsg);
+      } else {
+        c.msgs.pop();
+        if (e.name === "AbortError") {
+          input.value = text; fit();
+        } else {
+          errRow(e.message, { text, images });
+        }
+      }
+    } finally {
+      if (raf) cancelAnimationFrame(raf);
+      persist(); ctl = null; setBusy(false); toEnd();
+      if (document.hasFocus()) input.focus();
+    }
+  }
+
+  /* Attachments */
+  function drawAttachments() {
+    const row = $("attachRow");
+    row.innerHTML = "";
+    if (!pendingAttachments.length) { row.classList.remove("show"); return; }
+    row.classList.add("show");
+    pendingAttachments.forEach((att, i) => {
+      const div = document.createElement("div"); div.className = "attach";
+      const img = document.createElement("img"); img.src = att.preview; img.alt = "";
+      const b = document.createElement("button"); b.type = "button"; b.textContent = "×";
+      b.setAttribute("aria-label", "Hapus lampiran");
+      b.onclick = () => { pendingAttachments.splice(i, 1); drawAttachments(); if (!busy) setBusy(false); };
+      div.append(img, b);
+      row.appendChild(div);
+    });
+  }
+
+  async function compressImage(file, maxDim = 1024) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        let { width, height } = img;
+        const scale = Math.min(1, maxDim / Math.max(width, height));
+        width = Math.round(width * scale);
+        height = Math.round(height * scale);
+        const canvas = document.createElement("canvas");
+        canvas.width = width; canvas.height = height;
+        canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+        const data = dataUrl.split(",")[1];
+        resolve({ mime: "image/jpeg", data, preview: dataUrl });
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Gagal memuat gambar")); };
+      img.src = url;
+    });
+  }
+
+  $("attach").onclick = () => $("file").click();
+  $("file").onchange = async e => {
+    const files = Array.from(e.target.files || []);
+    for (const f of files) {
+      if (!f.type.startsWith("image/")) { alert("Hanya file gambar yang didukung."); continue; }
+      if (f.size > 15 * 1024 * 1024) { alert("\"" + f.name + "\" terlalu besar (max 15MB)."); continue; }
+      try {
+        const c = await compressImage(f);
+        pendingAttachments.push(c);
+      } catch { alert("Gagal memproses \"" + f.name + "\"."); }
+    }
+    e.target.value = "";
+    drawAttachments();
+    if (!busy) setBusy(false);
+  };
+
+  /* Input */
+  function fit() { input.style.height = "auto"; input.style.height = Math.min(input.scrollHeight, 170) + "px"; }
+  input.addEventListener("input", () => { fit(); if (!busy) send.disabled = !input.value.trim() && !pendingAttachments.length; });
+  input.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); $("form").requestSubmit(); } });
+  $("form").addEventListener("submit", e => {
+    e.preventDefault();
+    if (busy) { ctl?.abort(); return; }
+    const text = input.value;
+    const imgs = pendingAttachments.slice();
+    if (!text.trim() && !imgs.length) return;
+    submit(text, imgs);
+  });
+  $("new").onclick = () => { if (busy) ctl?.abort(); cur = ""; persist(); drawAll(); closeSide(); input.focus(); };
+
+  /* Copy handler (kode & jawaban) */
+  log.addEventListener("click", async e => {
+    const b = e.target.closest("[data-cc],[data-cm]"); if (!b) return;
+    const t = b.hasAttribute("data-cc") ? b.closest(".code").querySelector("code").textContent : b._t;
+    const old = b.textContent;
+    try { await navigator.clipboard.writeText(t); b.textContent = "Tersalin"; } catch { b.textContent = "Gagal"; }
+    setTimeout(() => b.textContent = old, 1400);
+  });
+
+  /* Shortcut */
+  document.addEventListener("keydown", e => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") { e.preventDefault(); $("new").click(); }
+    if (e.key === "Escape" && document.body.classList.contains("open")) closeSide();
+  });
+
+  $("q").addEventListener("input", drawList);
+  setBusy(false); drawAll();
+})();
+</script>
+</body>
+</html>
