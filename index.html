@@ -164,6 +164,23 @@ textarea::placeholder{color:var(--muted)}
 .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.92);display:grid;place-items:center;z-index:100;padding:24px;cursor:zoom-out}
 .lightbox img{max-width:100%;max-height:100%;border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
 
+/* Modal (Custom Popup) */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;place-items:center;z-index:200;padding:20px;backdrop-filter:blur(4px)}
+.modal-overlay.show{display:grid}
+.modal-box{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:24px;width:100%;max-width:400px;box-shadow:0 20px 40px rgba(0,0,0,.4)}
+.modal-box h3{font-family:var(--serif);font-size:20px;margin-bottom:12px;font-weight:500}
+.modal-box input{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;color:var(--ink);font:inherit;margin-bottom:16px;outline:none}
+.modal-box input:focus{border-color:var(--accent)}
+.modal-box p{font-size:14px;color:var(--muted);margin-bottom:20px;line-height:1.5}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end}
+.modal-actions button{padding:8px 16px;border-radius:8px;font-weight:600;font-size:14px;border:1px solid transparent;cursor:pointer;transition:filter .15s}
+.btn-cancel{background:none;border-color:var(--line);color:var(--ink)}
+.btn-cancel:hover{background:var(--bg)}
+.btn-confirm{background:var(--accent);color:var(--accent-ink)}
+.btn-confirm:hover{filter:brightness(1.1)}
+.btn-danger{background:var(--err);color:#fff}
+.btn-danger:hover{filter:brightness(1.1)}
+
 .scrim{display:none}
 @media (max-width:760px){
   aside{position:fixed;inset:0 auto 0 0;z-index:20;transform:translateX(-100%);width:min(82vw,300px)}
@@ -213,17 +230,29 @@ textarea::placeholder{color:var(--muted)}
   <svg viewBox="0 0 24 24"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
 </button>
 
+<!-- Modal Kustom -->
+<div class="modal-overlay" id="modal">
+  <div class="modal-box">
+    <h3 id="modalTitle">Judul</h3>
+    <p id="modalDesc"></p>
+    <input type="text" id="modalInput" />
+    <div class="modal-actions">
+      <button class="btn-cancel" id="modalCancel">Batal</button>
+      <button class="btn-confirm" id="modalConfirm">Simpan</button>
+    </div>
+  </div>
+</div>
+
 <script>
 (() => {
-  const API_KEY = "AQ.Ab8RN6IzbGThaVmaT87QlO4OsFQXq4juAQR_QvF-l4EV3Qio6A";
   const MODEL = "gemini-3.5-flash-lite";
+  const URL_ = "https://elara-proxy.gilanglink3-0fa.workers.dev";
   const SYSTEM = [
     "Kamu adalah Elara, asisten AI pribadi perempuan. Gunakan sapaan 'aku' untuk dirimu dan 'kamu' untuk pengguna.",
     "Kepribadian: cerdas, tenang, dan berwawasan luas; ramah, sopan, dan komunikatif; punya pembawaan elegan dan profesional; mampu berpikir kritis dan analitis; kreatif dalam memberi solusi; tidak kaku dan tidak terdengar seperti robot.",
     "Gaya komunikasi: selalu gunakan bahasa Indonesia yang natural dan sesuaikan gaya bahasa dengan pengguna. Utamakan jawaban yang jelas, akurat, dan mudah dipahami. Jangan memakai kalimat pembuka yang berulang-ulang. Jangan bertele-tele untuk pertanyaan sederhana. Tetap sopan tanpa terlalu formal.",
     "Jika ditanya siapa kamu, perkenalkan dirimu sebagai Elara. Jika ditanya dengan jujur apakah kamu manusia, akui bahwa kamu asisten AI."
   ].join("\n");
-  const URL_ = "https://generativelanguage.googleapis.com/v1beta/models/" + MODEL + ":streamGenerateContent?alt=sse";
   const IDEAS = [
     ["PENJELASAN", "Jelaskan cara kerja internet dengan bahasa sederhana"],
     ["BELAJAR", "Buatkan rencana belajar JavaScript selama 30 hari"],
@@ -238,6 +267,12 @@ textarea::placeholder{color:var(--muted)}
 
   const $ = id => document.getElementById(id);
   const log = $("log"), main = $("main"), input = $("input"), send = $("send"), list = $("list"), scrollBtn = $("scrollBtn");
+  
+  // Elemen Modal
+  const modal = $("modal"), modalTitle = $("modalTitle"), modalDesc = $("modalDesc"), 
+        modalInput = $("modalInput"), modalCancel = $("modalCancel"), modalConfirm = $("modalConfirm");
+  let modalResolve = null;
+
   const store = {
     get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : v; } catch { return d; } },
     set(k, v) { try { localStorage.setItem(k, v); return true; } catch { return false; } }
@@ -247,7 +282,6 @@ textarea::placeholder{color:var(--muted)}
   try { convs = JSON.parse(store.get("gv2_convs", "[]")) || []; } catch { convs = []; }
   let cur = store.get("gv2_cur", "");
   if (!convs.some(c => c.id === cur)) cur = "";
-  // Migrasi: pastikan setiap pesan punya ts
   convs.forEach(c => (c.msgs || []).forEach(m => { if (!m.ts) m.ts = c.t || +c.id || Date.now(); }));
 
   let busy = false, ctl = null;
@@ -258,7 +292,6 @@ textarea::placeholder{color:var(--muted)}
   function persist() {
     const payload = JSON.stringify(convs.slice(0, 40));
     if (!store.set("gv2_convs", payload)) {
-      // Quota penuh: coba strip gambar dari pesan lama
       const stripped = convs.slice(0, 40).map(c => ({
         ...c,
         msgs: c.msgs.map((m, i, arr) => (i < arr.length - 2 && m.images) ? { ...m, images: undefined } : m)
@@ -268,7 +301,56 @@ textarea::placeholder{color:var(--muted)}
     store.set("gv2_cur", cur);
   }
 
-  /* Tema */
+  /* Logika Modal */
+  function showModal({ title, desc, inputVal, confirmText, isDanger }) {
+    return new Promise(resolve => {
+      modalResolve = resolve;
+      modalTitle.textContent = title;
+      modalDesc.textContent = desc || "";
+      modalDesc.style.display = desc ? "block" : "none";
+      
+      if (inputVal !== undefined) {
+        modalInput.style.display = "block";
+        modalInput.value = inputVal;
+      } else {
+        modalInput.style.display = "none";
+      }
+      
+      modalConfirm.textContent = confirmText || "Simpan";
+      modalConfirm.className = isDanger ? "btn-danger" : "btn-confirm";
+      
+      modal.classList.add("show");
+      
+      if (inputVal !== undefined) {
+        modalInput.focus();
+        modalInput.select();
+      } else {
+        modalConfirm.focus();
+      }
+    });
+  }
+
+  function closeModal(result) {
+    modal.classList.remove("show");
+    if (modalResolve) {
+      modalResolve(result);
+      modalResolve = null;
+    }
+  }
+
+  modalCancel.onclick = () => closeModal(null);
+  modal.onclick = (e) => { if (e.target === modal) closeModal(null); };
+  modalConfirm.onclick = () => {
+    const isInput = modalInput.style.display !== "none";
+    closeModal(isInput ? modalInput.value.trim() : true);
+  };
+  modalInput.addEventListener("keydown", e => {
+    if (e.key === "Enter") { e.preventDefault(); modalConfirm.click(); }
+  });
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && modal.classList.contains("show")) closeModal(null);
+  });
+
   const setTheme = t => document.documentElement.setAttribute("data-theme", t);
   const savedTheme = store.get("gv2_theme", "");
   if (savedTheme) setTheme(savedTheme);
@@ -278,12 +360,10 @@ textarea::placeholder{color:var(--muted)}
     setTheme(t); store.set("gv2_theme", t);
   };
 
-  /* Sidebar mobile */
   const closeSide = () => document.body.classList.remove("open");
   $("menu").onclick = () => document.body.classList.add("open");
   $("scrim").onclick = closeSide;
 
-  /* Waktu */
   function fmtTime(ts) {
     if (!ts) return "";
     const d = new Date(ts), now = new Date();
@@ -295,7 +375,6 @@ textarea::placeholder{color:var(--muted)}
     return d.toLocaleDateString("id-ID", { day: "numeric", month: "short" }) + " " + hm;
   }
 
-  /* Markdown ringan */
   const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const inl = s => s.replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>").replace(/(^|[^*])\*([^*\s][^*]*)\*/g, "$1<em>$2</em>");
   function md(src) {
@@ -320,7 +399,6 @@ textarea::placeholder{color:var(--muted)}
     return out.replace(/\u0000(\d+)\u0000/g, (_, i) => blocks[+i]);
   }
 
-  /* Scroll */
   function toEnd(force) {
     if (force || autoScroll) main.scrollTop = main.scrollHeight;
   }
@@ -334,7 +412,6 @@ textarea::placeholder{color:var(--muted)}
   });
   scrollBtn.onclick = () => { autoScroll = true; scrollBtn.classList.remove("show"); toEnd(true); };
 
-  /* Lightbox */
   function showLightbox(src) {
     const ov = document.createElement("div");
     ov.className = "lightbox";
@@ -347,7 +424,6 @@ textarea::placeholder{color:var(--muted)}
     document.body.appendChild(ov);
   }
 
-  /* Render pesan */
   function userRow(m) {
     const wrap = document.createElement("div");
     wrap.className = "u-wrap";
@@ -424,7 +500,6 @@ textarea::placeholder{color:var(--muted)}
     d.appendChild(b); log.appendChild(d);
   }
 
-  /* Edit pesan */
   function startEdit(m, wrap) {
     const u = wrap.querySelector(".u") || (() => { const el = document.createElement("div"); el.className = "u"; wrap.insertBefore(el, wrap.firstChild); return el; })();
     const acts = wrap.querySelector(".u-acts");
@@ -481,7 +556,6 @@ textarea::placeholder{color:var(--muted)}
     submit(lastUser.text, lastUser.images);
   }
 
-  /* Sidebar list */
   function grp(t) {
     const day = x => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
     const d = Math.round((day(new Date()) - day(new Date(t))) / 864e5);
@@ -507,9 +581,13 @@ textarea::placeholder{color:var(--muted)}
 
     const rn = document.createElement("button"); rn.type = "button";
     rn.innerHTML = RENAME; rn.setAttribute("aria-label", "Ganti nama"); rn.title = "Ganti nama";
-    rn.onclick = (e) => {
+    rn.onclick = async (e) => {
       e.stopPropagation();
-      const nt = prompt("Nama obrolan:", c.title);
+      const nt = await showModal({
+        title: "Ganti Nama",
+        inputVal: c.title,
+        confirmText: "Simpan"
+      });
       if (nt !== null && nt.trim()) {
         c.title = nt.trim(); persist(); drawAll();
       }
@@ -517,9 +595,15 @@ textarea::placeholder{color:var(--muted)}
 
     const x = document.createElement("button"); x.type = "button"; x.className = "del";
     x.innerHTML = TRASH; x.setAttribute("aria-label", "Hapus obrolan"); x.title = "Hapus";
-    x.onclick = (e) => {
+    x.onclick = async (e) => {
       e.stopPropagation();
-      if (!confirm("Hapus obrolan \"" + c.title + "\"?")) return;
+      const yes = await showModal({
+        title: "Hapus Obrolan",
+        desc: `Yakin ingin menghapus "${c.title}"? Tindakan ini tidak bisa dibatalkan.`,
+        confirmText: "Hapus",
+        isDanger: true
+      });
+      if (!yes) return;
       if (c.id === cur) { if (busy) ctl?.abort(); cur = ""; }
       convs = convs.filter(v => v.id !== c.id); persist(); drawAll();
     };
@@ -578,7 +662,6 @@ textarea::placeholder{color:var(--muted)}
     }
   }
 
-  /* Busy */
   function setBusy(v) {
     busy = v;
     send.innerHTML = v ? STOP : SEND;
@@ -614,7 +697,7 @@ textarea::placeholder{color:var(--muted)}
     for (let i = 0; ; i++) {
       let res;
       try {
-        res = await fetch(URL_, { method: "POST", signal, headers: { "Content-Type": "application/json", "x-goog-api-key": API_KEY }, body });
+        res = await fetch(URL_, { method: "POST", signal, headers: { "Content-Type": "application/json" }, body });
       } catch (e) {
         if (e.name === "AbortError") throw e;
         if (i < 2) { onRetry(); await sleep(1200 * (i + 1)); continue; }
@@ -623,7 +706,6 @@ textarea::placeholder{color:var(--muted)}
       if (res.ok) return res;
       const d = await res.json().catch(() => ({}));
       if ([429, 500, 503].includes(res.status) && i < 2) {
-        // Hormati retryDelay kalau ada
         let wait = 1500 * (i + 1);
         for (const det of (d.error?.details || [])) {
           if (det.retryDelay) {
@@ -638,7 +720,6 @@ textarea::placeholder{color:var(--muted)}
     }
   }
 
-  /* Kirim */
   async function submit(text, images) {
     text = (text || "").trim();
     images = images || [];
@@ -719,7 +800,6 @@ textarea::placeholder{color:var(--muted)}
     }
   }
 
-  /* Attachments */
   function drawAttachments() {
     const row = $("attachRow");
     row.innerHTML = "";
@@ -774,7 +854,6 @@ textarea::placeholder{color:var(--muted)}
     if (!busy) setBusy(false);
   };
 
-  /* Input */
   function fit() { input.style.height = "auto"; input.style.height = Math.min(input.scrollHeight, 170) + "px"; }
   input.addEventListener("input", () => { fit(); if (!busy) send.disabled = !input.value.trim() && !pendingAttachments.length; });
   input.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); $("form").requestSubmit(); } });
@@ -788,7 +867,6 @@ textarea::placeholder{color:var(--muted)}
   });
   $("new").onclick = () => { if (busy) ctl?.abort(); cur = ""; persist(); drawAll(); closeSide(); input.focus(); };
 
-  /* Copy handler (kode & jawaban) */
   log.addEventListener("click", async e => {
     const b = e.target.closest("[data-cc],[data-cm]"); if (!b) return;
     const t = b.hasAttribute("data-cc") ? b.closest(".code").querySelector("code").textContent : b._t;
@@ -797,7 +875,6 @@ textarea::placeholder{color:var(--muted)}
     setTimeout(() => b.textContent = old, 1400);
   });
 
-  /* Shortcut */
   document.addEventListener("keydown", e => {
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") { e.preventDefault(); $("new").click(); }
     if (e.key === "Escape" && document.body.classList.contains("open")) closeSide();
