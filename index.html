@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-theme="light">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -1491,7 +1491,7 @@ header{position:relative;z-index:8}
 
   const setTheme = t => { document.documentElement.setAttribute("data-theme", t); applyAvatar(t); };
   const savedTheme = store.get("gv2_theme", "");
-  setTheme(savedTheme || (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark"));
+  setTheme(savedTheme || "light");
   $("theme").onclick = () => {
     const t = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
     setTheme(t); store.set("gv2_theme", t);
