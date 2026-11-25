@@ -40,12 +40,18 @@ aside{width:288px;background:var(--side);border-right:1px solid var(--line);disp
 .search input:focus{border-color:var(--accent)}
 .search input::placeholder{color:var(--muted)}
 #list{flex:1;overflow-y:auto;margin:0 -6px;padding:0 6px}
-.grp{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:16px 8px 6px}
-.item{position:relative;display:flex;align-items:center;border-radius:10px}
+.grp{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:16px 8px 6px}
+.grp svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+.item{position:relative;border-radius:10px;overflow:hidden;margin-bottom:2px}
+.del-reveal{position:absolute;inset:0;display:flex;align-items:center;justify-content:flex-end;padding-right:18px;gap:6px;background:var(--err);border-radius:10px;color:#fff;font-size:12px;font-weight:700;letter-spacing:.02em;pointer-events:none}
+.del-reveal svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.item-content{position:relative;display:flex;align-items:center;border-radius:10px;background:var(--side);transition:transform .25s cubic-bezier(.2,.9,.3,1);will-change:transform;z-index:1}
+.item-content.dragging{transition:none}
+.item:hover .item-content,.item.on .item-content{background:var(--surface)}
 .item .t{flex:1;min-width:0;background:none;border:none;text-align:left;padding:9px 92px 9px 12px;border-radius:10px;color:var(--ink);opacity:.75;font-size:14px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.item:hover,.item.on{background:var(--surface)}
 .item.on .t{opacity:1;font-weight:600}
-.item.on::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:3px;border-radius:2px;background:var(--accent)}
+.item.on .item-content::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:3px;border-radius:2px;background:var(--accent);pointer-events:none}
 .item .acts-side{position:absolute;right:4px;top:50%;transform:translateY(-50%);display:flex;gap:2px;opacity:0;transition:opacity .15s}
 .item:hover .acts-side,.item:focus-within .acts-side{opacity:1}
 .item .acts-side button{width:26px;height:26px;border:none;background:none;color:var(--muted);border-radius:6px;display:grid;place-items:center}
@@ -53,7 +59,14 @@ aside{width:288px;background:var(--side);border-right:1px solid var(--line);disp
 .item .acts-side button.del:hover{color:var(--err)}
 .item .acts-side button.pin-on{color:var(--accent)}
 .item .acts-side svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-@media (hover:none){.item .acts-side{opacity:.85}}
+.item .acts-side button.pin-on svg{stroke-width:2.3}
+.item, .item * { touch-action: pan-y; }
+.item-content { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+@media (hover:none){
+  .item .acts-side{opacity:.85}
+  .item .acts-side .del{display:none}
+  .item .t{padding-right:64px}
+}
 .none{color:var(--muted);font-size:13px;padding:14px 8px;line-height:1.55}
 .keybtn{display:flex;align-items:center;gap:10px;width:100%;margin-top:10px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-size:14px;font-weight:600;text-align:left;transition:border-color .15s}
 .keybtn:hover{border-color:var(--accent)}
@@ -319,7 +332,7 @@ header{position:relative;z-index:8}
 <div class="modal-overlay" id="keyModal">
   <div class="modal-box">
     <h3>API key</h3>
-    <p>Isi key untuk provider yang mau kamu pakai. Key hanya disimpan di browser ini dan dikirim langsung ke Google / Groq / OpenRouter / Mistral / InferX / Zro.</p>
+    <p>Isi key untuk provider yang mau kamu pakai. Key hanya disimpan di browser ini dan dikirim langsung ke Google / Groq / OpenRouter / Mistral / InferX / Zro. Untuk Cloudflare dan Coarena, key disimpan di sisi Worker (tidak perlu diisi di sini).</p>
     <div class="klab"><span>Gemini</span><a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">Dapatkan key</a></div>
     <div class="kfield"><input id="kGemini" type="text" placeholder="Tempel API key Gemini" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" /><button type="button" data-for="kGemini">Lihat</button></div>
     <div class="klab"><span>Groq</span><a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer">Dapatkan key</a></div>
@@ -347,7 +360,7 @@ header{position:relative;z-index:8}
   // ============================================================
   // GANTI URL INI dengan URL Worker Cloudflare Anda
   // ============================================================
-  const WORKER_BASE = "https://elara.gilangaputra9g.workers.dev/";
+  const WORKER_BASE = "https://elara.gilangaputra9g.workers.dev";
 
   const SPOKES = `<path d="M32 32L32.0 10.0"/><path d="M32 32L40.0 18.1"/><path d="M32 32L51.9 20.5"/><path d="M32 32L47.0 32.0"/><path d="M32 32L50.2 42.5"/><path d="M32 32L40.5 46.7"/><path d="M32 32L32.0 55.0"/><path d="M32 32L24.0 45.9"/><path d="M32 32L12.9 43.0"/><path d="M32 32L17.0 32.0"/><path d="M32 32L13.8 21.5"/><path d="M32 32L23.5 17.3"/>`;
   const avatarFor = light => {
@@ -369,10 +382,7 @@ header{position:relative;z-index:8}
     "Kamu boleh memakai tabel markdown, tautan [teks](url), kutipan (>), daftar, dan blok kode berlabel bahasa bila membantu."
   ].join("\n");
 
-  // ==========================================================
-  // KOLEKSI 1000 PROMPT REKOMENDASI
-  // ==========================================================
-  const IDEAS = [
+    const IDEAS = [
     // ================== KODING (50) ==================
     ["KODING", "Buatkan fungsi JavaScript untuk memvalidasi email dengan regex"],
     ["KODING", "Jelaskan perbedaan antara let, const, dan var di JavaScript"],
@@ -1417,7 +1427,7 @@ header{position:relative;z-index:8}
 
   const SEND = '<svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
   const STOP = '<svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>';
-  const PIN = '<svg viewBox="0 0 24 24"><path d="M9 4h6l-1.5 6.5L18 14h-5v7l-1-7H7l4.5-3.5L9 4z"/></svg>';
+  const PIN = '<svg viewBox="0 0 24 24"><path d="M12 17v5"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24z"/></svg>';
   const RENAME = '<svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>';
   const TRASH = '<svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12M9 7V4h6v3"/></svg>';
 
@@ -1487,7 +1497,7 @@ header{position:relative;z-index:8}
     setTheme(t); store.set("gv2_theme", t);
   };
 
-  // ============ API KEY (tidak lagi dipakai untuk request; disisakan untuk fallback) ============
+  // ============ API KEY (fallback) ============
   const cleanKey = s => (s || "").replace(/\s+/g, "").replace(/^["'`]+|["'`]+$/g, "");
   const keys = {
     gemini: cleanKey(store.get("gv2_key_gemini", "")),
@@ -1498,7 +1508,11 @@ header{position:relative;z-index:8}
     zro: cleanKey(store.get("gv2_key_zro", "")),
     pollinations: cleanKey(store.get("gv2_key_pollinations", ""))
   };
-  const PNAME = { gemini: "Gemini", groq: "Groq", openrouter: "OpenRouter", mistral: "Mistral", inferx: "InferX", zro: "Zro MoonMath", pollinations: "Pollinations" };
+  const PNAME = {
+    gemini: "Gemini", groq: "Groq", openrouter: "OpenRouter", mistral: "Mistral",
+    inferx: "InferX", zro: "Zro MoonMath", pollinations: "Pollinations",
+    nvidia: "NVIDIA", cloudflare: "Cloudflare", coarena: "Coarena"
+  };
   const keyModal = $("keyModal"),
         kGemini = $("kGemini"), kGroq = $("kGroq"), kOpenrouter = $("kOpenrouter"),
         kMistral = $("kMistral"), kInferx = $("kInferx"), kZro = $("kZro"), kPollinations = $("kPollinations"), kMsg = $("kMsg");
@@ -1543,53 +1557,70 @@ header{position:relative;z-index:8}
   const I_CHIP = MI("M9 3v2M15 3v2M9 19v2M15 19v2M3 9h2M3 15h2M19 9h2M19 15h2M7 7h10v10H7z");
 
   const TAG_META = {
-    "cepat":       { cls: "tag-cepat",  label: "Cepat" },
-    "sedang":      { cls: "tag-sedang", label: "Sedang" },
-    "lambat":      { cls: "tag-slow",   label: "Lambat" },
-    "high-demand": { cls: "tag-demand", label: "High Demand" }
+    "fast": { cls: "tag-cepat",  label: "Fast" },
+    "mid":  { cls: "tag-sedang", label: "Mid" },
+    "slow": { cls: "tag-slow",   label: "Slow" },
+    "busy": { cls: "tag-demand", label: "Busy" }
   };
 
   const MODELS = [
     // Groq
-    ["openai/gpt-oss-20b", "GPT-OSS 20B", "Super cepat", I_WIND, "groq", false, ["cepat"]],
-    ["openai/gpt-oss-120b", "GPT-OSS 120B", "Penalaran kuat", I_FLAME, "groq", false, ["cepat"]],
-    ["qwen/qwen3.8-27b", "Qwen 3.8 27B", "Multimodal (teks + gambar)", I_SPARK, "groq", true, ["cepat"]],
+    ["openai/gpt-oss-20b", "GPT-OSS 20B", "Paling ngebut, cocok buat tanya-jawab harian", I_WIND, "groq", false, ["fast"]],
+    ["openai/gpt-oss-120b", "GPT-OSS 120B", "Lebih pintar menalar, tetap cepat", I_FLAME, "groq", false, ["fast"]],
+    ["qwen/qwen3.8-27b", "Qwen 3.8 27B", "Bisa baca teks dan gambar sekaligus", I_SPARK, "groq", true, ["fast"]],
+    // NVIDIA
+    ["nvidia/nemotron-3-ultra-550b-a55b", "Nemotron 3 Ultra", "Flagship NVIDIA, nalar terkuat, konteks 1M", I_FLAME, "nvidia", false, ["slow"]],
+    ["nvidia/nemotron-3.5-lightning-30b-a3b", "Nemotron 3.5 Lightning", "Versi ringan Nemotron, respons gesit", I_WIND, "nvidia", false, ["fast"]],
+    ["poolside/laguna-xs-2.1", "Laguna XS 2.1", "Dirancang buat coding dan tugas teknis", I_BOLT, "nvidia", false, ["mid"]],
+    ["nvidia/nemotron-3-nano-omni-30b-a3b-reasoning", "Nemotron 3 Nano Omni", "Mikir dulu sebelum menjawab, ukuran sedang", I_CHIP, "nvidia", false, ["mid"]],
+    ["nvidia/nemotron-3.5-super-vl-120b-a12b", "Nemotron 3.5 Super VL", "Bisa lihat gambar, versi early access", I_SPARK, "nvidia", false, ["mid"]],
+    ["nvidia/nemotron-3.5-bolt-e4b", "Nemotron 3.5 Bolt E4B", "Nemotron kecil, sangat ngebut tapi sederhana", I_BOLT, "nvidia", false, ["fast"]],
     // OpenRouter
-    ["nvidia/nemotron-3-ultra-550b-a55b:free", "Nemotron 3 Ultra", "Reasoning terkuat, konteks 1M", I_FLAME, "openrouter", false, ["lambat", "high-demand"]],
-    ["baidu/ernie-5.5-flash-preview:free", "ERNIE 5.5 Flash", "Konteks 1M, cepat", I_BOLT, "openrouter", false, ["high-demand"]],
-    ["nvidia/nemotron-3.5-super-vl:free", "Nemotron 3.5 Super VL", "Vision (gambar/video), 1M", I_SPARK, "openrouter", true, ["lambat", "high-demand"]],
-    ["recursive/flint-v1.0:free", "Flint 1.0", "Coding agent, 262K", I_BOLT, "openrouter", false, ["high-demand"]],
-    ["liquid/lfm-3-1.7b:free", "LFM 3 1.7B", "Sangat ringan, 262K", I_WIND, "openrouter", false, ["high-demand"]],
-    ["openrouter/free", "Auto (Free Router)", "Pilih model gratis otomatis", I_CHIP, "openrouter", false, ["high-demand"]],
+    ["nvidia/nemotron-3-ultra-550b-a55b:free", "Nemotron 3 Ultra", "Nalar terkuat, konteks 1M, agak lama mikir", I_FLAME, "openrouter", false, ["slow"]],
+    ["baidu/ernie-5.5-flash-preview:free", "ERNIE 5.5 Flash", "Cepat dengan konteks 1M, sering antre", I_BOLT, "openrouter", false, ["busy"]],
+    ["nvidia/nemotron-3.5-super-vl:free", "Nemotron 3.5 Super VL", "Bisa baca gambar dan video, konteks 1M", I_SPARK, "openrouter", true, ["slow"]],
+    ["recursive/flint-v1.0:free", "Flint 1.0", "Jago ngoding sebagai agent, konteks 262K", I_BOLT, "openrouter", false, ["busy"]],
+    ["liquid/lfm-3-1.7b:free", "LFM 3 1.7B", "Mungil dan irit, buat tugas ringan", I_WIND, "openrouter", false, ["busy"]],
+    ["openrouter/free", "Auto (Free Router)", "Otomatis pilih model gratis yang lagi lowong", I_CHIP, "openrouter", false, ["busy"]],
     // Zro
-    ["deepseek-v4.1-flash", "DeepSeek V4.1 Flash", "Free plan · reasoning", I_FLAME, "zro", false, ["lambat"]],
-    ["openai/gpt-5.4-nano", "GPT-5.4 Nano", "Ringan & hemat", I_BOLT, "pollinations", false, ["sedang"]],
-    ["openai/gpt-oss-20b", "GPT-OSS 20B", "Open-weight", I_WIND, "pollinations", false, ["sedang"]],
-    ["deepseek/deepseek-v4-flash", "DeepSeek V4 Flash", "Cepat", I_FLAME, "pollinations", false, ["sedang"]],
-    // InferX
-    ["deepseek-v4-flash-0731", "DeepSeek V4 Flash", "Cepat & gratis", I_BOLT, "inferx", false, ["high-demand"]],
-    ["deepseek-v4.1-flash-1017", "DeepSeek V4.1 Flash", "Promo 100%", I_FLAME, "inferx", false, ["high-demand"]],
-    ["Agents-A1", "Agents A1", "Agent khusus", I_SPARK, "inferx", false, ["high-demand"]],
-    ["gemma-4-31B-it-fp8", "Gemma 4 31B", "Google open", I_LEAF, "inferx", false, ["high-demand"]],
-    ["Devstral-2-123B-Instruct-2512-int4-AutoRound", "Devstral 2 123B", "Coding kuat", I_BOLT, "inferx", false, ["high-demand"]],
-    ["glm-5.3-flash", "GLM 5.3 Flash", "Cepat", I_WIND, "inferx", false, ["high-demand"]],
-    ["glm-5.3", "GLM 5.3", "Penalaran", I_CHIP, "inferx", false, ["high-demand"]],
-    // Mistral
-    ["codestral-latest", "Codestral", "Spesialis coding", I_BOLT, "mistral", false, ["sedang"]],
-    ["open-mistral-nemo", "Mistral Nemo", "12B, seimbang", I_LEAF, "mistral", false, ["sedang"]],
+    ["deepseek-v4.1-flash", "DeepSeek V4.1 Flash", "Mikir dulu baru jawab, paket gratis", I_FLAME, "zro", false, ["slow"]],
     // Gemini
-    ["gemini-3.5-flash-lite", "3.5 Flash-Lite", "Cepat & ringan", I_LEAF, "gemini", true, ["high-demand"]]
+    ["gemini-3.5-flash-lite", "3.5 Flash-Lite", "Cepat, ringan, dan bisa baca gambar", I_LEAF, "gemini", true, ["busy"]],
+    // Cloudflare (3 model)
+    ["@cf/openai/gpt-oss-120b", "GPT-OSS 120B", "Flagship open-weight, gratis di Workers AI", I_FLAME, "cloudflare", false, ["mid"]],
+    ["@cf/meta/llama-3.3-70b-instruct-fp8-fast", "Llama 3.3 70B", "Cepat dan mumpuni, konteks panjang", I_WIND, "cloudflare", false, ["fast"]],
+    ["@cf/meta/llama-4-scout-17b-16e-instruct", "Llama 4 Scout", "Bisa baca gambar, cepat", I_SPARK, "cloudflare", true, ["fast"]],
+    // Coarena (3 model)
+    ["deepseek-v4-1-flash-1017", "DeepSeek V4.1 Flash", "Cepat dan hemat, paket gratis", I_FLAME, "coarena", false, ["fast"]],
+    ["gpt-6-luna", "GPT-6 Luna", "Model OpenAI, cepat dan efisien", I_SPARK, "coarena", false, ["fast"]],
+    ["gemini-3-8-flash", "Gemini 3.8 Flash", "Model Google yang cepat", I_LEAF, "coarena", false, ["fast"]],
+    // Pollinations
+    ["openai/gpt-5.4-nano", "GPT-5.4 Nano", "Ringan dan hemat buat obrolan santai", I_BOLT, "pollinations", false, ["mid"]],
+    ["openai/gpt-oss-20b", "GPT-OSS 20B", "Open-weight, tanpa ribet", I_WIND, "pollinations", false, ["mid"]],
+    ["deepseek/deepseek-v4-flash", "DeepSeek V4 Flash", "Cepat dan hemat, bagus buat penalaran", I_FLAME, "pollinations", false, ["mid"]],
+    // InferX
+    ["deepseek-v4-flash-0731", "DeepSeek V4 Flash", "Cepat dan gratis", I_BOLT, "inferx", false, ["busy"]],
+    ["deepseek-v4.1-flash-1017", "DeepSeek V4.1 Flash", "Versi terbaru, promo gratis 100%", I_FLAME, "inferx", false, ["busy"]],
+    ["Agents-A1", "Agents A1", "Dirancang khusus buat tugas agent", I_SPARK, "inferx", false, ["busy"]],
+    ["gemma-4-31B-it-fp8", "Gemma 4 31B", "Model terbuka Google yang serbaguna", I_LEAF, "inferx", false, ["busy"]],
+    ["Devstral-2-123B-Instruct-2512-int4-AutoRound", "Devstral 2 123B", "Spesialis coding berukuran besar", I_BOLT, "inferx", false, ["busy"]],
+    ["glm-5.3-flash", "GLM 5.3 Flash", "Respons cepat, serba bisa", I_WIND, "inferx", false, ["busy"]],
+    ["glm-5.3", "GLM 5.3", "Penalaran mendalam buat soal rumit", I_CHIP, "inferx", false, ["busy"]],
+    // Mistral
+    ["codestral-latest", "Codestral", "Khusus coding, paham banyak bahasa pemrograman", I_BOLT, "mistral", false, ["mid"]],
+    ["open-mistral-nemo", "Mistral Nemo", "12B, ringan tapi seimbang", I_LEAF, "mistral", false, ["mid"]]
   ];
-  let currentModel = store.get("gv2_model", "openai/gpt-oss-20b");
-  if (!MODELS.some(m => m[0] === currentModel)) currentModel = "openai/gpt-oss-20b";
-  const curModel = () => MODELS.find(x => x[0] === currentModel) || MODELS[0];
+  const mkey = m => m[4] + "|" + m[0];
+  let currentModel = store.get("gv2_model", "groq|openai/gpt-oss-20b");
+  if (!MODELS.some(m => mkey(m) === currentModel)) currentModel = "groq|openai/gpt-oss-20b";
+  const curModel = () => MODELS.find(x => mkey(x) === currentModel) || MODELS[0];
   const mdl = $("mdl"), mBtn = $("modelBtn"), mMenu = $("modelMenu"), scrollHint = $("scrollHint");
   const paintModel = () => {
     const m = curModel();
     $("modelIcon").innerHTML = m[3];
     $("modelLabel").textContent = m[1];
     mMenu.querySelectorAll(".mopt").forEach(b => {
-      const on = b.dataset.id === currentModel;
+      const on = b.dataset.key === currentModel;
       b.classList.toggle("on", on);
       b.setAttribute("aria-selected", on ? "true" : "false");
     });
@@ -1615,7 +1646,7 @@ header{position:relative;z-index:8}
       const g = document.createElement("div"); g.className = "mgrp"; g.textContent = PNAME[m[4]]; mMenu.appendChild(g);
     }
     const b = document.createElement("button"); b.type = "button"; b.className = "mopt";
-    b.dataset.id = m[0]; b.dataset.prov = m[4];
+    b.dataset.id = m[0]; b.dataset.prov = m[4]; b.dataset.key = mkey(m);
     b.setAttribute("role", "option");
     b.innerHTML = '<span class="mi">' + m[3] + '</span><span class="mt"><span class="mt-h"><b></b></span><small></small></span><svg class="ck" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>';
     b.querySelector("b").textContent = m[1];
@@ -1632,7 +1663,7 @@ header{position:relative;z-index:8}
         th.appendChild(s);
       });
     }
-    b.onclick = () => { currentModel = m[0]; store.set("gv2_model", currentModel); paintModel(); setMenu(false); };
+    b.onclick = () => { currentModel = mkey(m); store.set("gv2_model", currentModel); paintModel(); setMenu(false); };
     mMenu.appendChild(b);
   });
   mBtn.onclick = e => { e.stopPropagation(); setMenu(!mdl.classList.contains("open")); };
@@ -1912,18 +1943,105 @@ header{position:relative;z-index:8}
     return d <= 0 ? "Hari ini" : d === 1 ? "Kemarin" : d < 8 ? "7 hari terakhir" : "Lebih lama";
   }
 
+  // ============ SWIPE → LANGSUNG POPUP HAPUS ============
+  function attachSwipe(row, content, onDelete) {
+    const MAX = 100;
+    let startX = 0, startY = 0, dx = 0;
+    let dragging = false, decided = false, pointerId = null;
+    let suppressClick = false;
+
+    content.addEventListener("pointerdown", e => {
+      if (e.pointerType === "mouse") return;
+      startX = e.clientX;
+      startY = e.clientY;
+      dx = 0;
+      dragging = false;
+      decided = false;
+      suppressClick = false;
+      pointerId = e.pointerId;
+    });
+
+    content.addEventListener("pointermove", e => {
+      if (pointerId !== e.pointerId) return;
+      const curX = e.clientX - startX;
+      const curY = e.clientY - startY;
+
+      if (!decided) {
+        if (Math.abs(curX) > 6 || Math.abs(curY) > 6) {
+          decided = true;
+          dragging = Math.abs(curX) > Math.abs(curY) && curX < 0;
+          if (!dragging) { pointerId = null; return; }
+          try { content.setPointerCapture(e.pointerId); } catch (_) {}
+          content.classList.add("dragging");
+        }
+      }
+
+      if (dragging) {
+        if (e.cancelable) e.preventDefault();
+        const t = Math.max(-MAX, Math.min(0, curX));
+        content.style.transform = `translateX(${t}px)`;
+        dx = curX;
+      }
+    });
+
+    const end = e => {
+      if (pointerId === null) return;
+      if (e && e.pointerId !== undefined && e.pointerId !== pointerId) return;
+      content.classList.remove("dragging");
+      if (dragging) {
+        suppressClick = true;
+        const finalDx = dx;
+        content.style.transform = "";
+        pointerId = null;
+        dragging = false;
+        setTimeout(() => { suppressClick = false; }, 300);
+        if (finalDx < -MAX * 0.5 && typeof onDelete === "function") {
+          onDelete();
+        }
+        return;
+      }
+      pointerId = null;
+      dragging = false;
+    };
+
+    content.addEventListener("pointerup", end);
+    content.addEventListener("pointercancel", end);
+
+    content.addEventListener("click", e => {
+      if (suppressClick) {
+        suppressClick = false;
+        e.stopPropagation();
+        e.preventDefault();
+      }
+    }, true);
+  }
+
   function makeItem(c) {
     const row = document.createElement("div");
     row.className = "item" + (c.id === cur ? " on" : "");
+
+    const reveal = document.createElement("div");
+    reveal.className = "del-reveal";
+    reveal.innerHTML = TRASH + "<span>Hapus</span>";
+
+    const content = document.createElement("div");
+    content.className = "item-content";
+
     const t = document.createElement("button"); t.type = "button"; t.className = "t";
     t.textContent = c.title; t.title = c.title;
-    t.onclick = () => { if (busy) ctl?.abort(); cur = c.id; persist(); drawAll(); closeSide(); };
+    t.onclick = () => {
+      if (busy) ctl?.abort();
+      cur = c.id; persist(); drawAll(); closeSide();
+    };
+
     const acts = document.createElement("div"); acts.className = "acts-side";
+
     const pn = document.createElement("button"); pn.type = "button"; pn.innerHTML = PIN;
     pn.setAttribute("aria-label", c.pinned ? "Lepas sematan" : "Sematkan");
     pn.title = c.pinned ? "Lepas sematan" : "Sematkan";
     if (c.pinned) pn.classList.add("pin-on");
     pn.onclick = e => { e.stopPropagation(); c.pinned = !c.pinned; persist(); drawList(); };
+
     const rn = document.createElement("button"); rn.type = "button";
     rn.innerHTML = RENAME; rn.setAttribute("aria-label", "Ganti nama"); rn.title = "Ganti nama";
     rn.onclick = async e => {
@@ -1931,16 +2049,29 @@ header{position:relative;z-index:8}
       const nt = await showModal({ title: "Ganti Nama", inputVal: c.title, confirmText: "Simpan" });
       if (nt !== null && nt.trim()) { c.title = nt.trim(); persist(); drawAll(); }
     };
+
     const x = document.createElement("button"); x.type = "button"; x.className = "del";
     x.innerHTML = TRASH; x.setAttribute("aria-label", "Hapus obrolan"); x.title = "Hapus";
-    x.onclick = async e => {
-      e.stopPropagation();
-      const yes = await showModal({ title: "Hapus Obrolan", desc: `Yakin ingin menghapus "${c.title}"? Tindakan ini tidak bisa dibatalkan.`, confirmText: "Hapus", isDanger: true });
+
+    const doDelete = async () => {
+      const yes = await showModal({
+        title: "Hapus Obrolan",
+        desc: `Yakin ingin menghapus "${c.title}"? Tindakan ini tidak bisa dibatalkan.`,
+        confirmText: "Hapus",
+        isDanger: true
+      });
       if (!yes) return;
       if (c.id === cur) { if (busy) ctl?.abort(); cur = ""; }
-      convs = convs.filter(v => v.id !== c.id); persist(); drawAll();
+      convs = convs.filter(v => v.id !== c.id);
+      persist(); drawAll();
     };
-    acts.append(pn, rn, x); row.append(t, acts);
+    x.onclick = e => { e.stopPropagation(); doDelete(); };
+
+    acts.append(pn, rn, x);
+    content.append(t, acts);
+    row.append(reveal, content);
+
+    attachSwipe(row, content, doDelete);
     return row;
   }
 
@@ -1956,7 +2087,8 @@ header{position:relative;z-index:8}
     const pinned = items.filter(c => c.pinned).sort(byT);
     const rest = items.filter(c => !c.pinned).sort(byT);
     if (pinned.length) {
-      const h = document.createElement("div"); h.className = "grp"; h.textContent = "📌 Disematkan";
+      const h = document.createElement("div"); h.className = "grp";
+      h.innerHTML = PIN + "Disematkan";
       list.appendChild(h); pinned.forEach(c => list.appendChild(makeItem(c)));
     }
     let last = "";
@@ -2006,6 +2138,7 @@ header{position:relative;z-index:8}
     if (status === 401 || status === 403) return "API key ditolak atau tidak punya akses ke model ini. Cek secret di Worker.";
     if (status === 402) return "Kuota/budget habis. Untuk Zro free plan, kuota di-reset setiap hari — coba lagi besok atau kurangi pemakaian.";
     if (status === 404) return "Model tidak tersedia atau sudah dihentikan penyedia. Pilih model lain di menu.";
+    if (status === 410) return "Model ini sudah dipensiunkan penyedia. Pilih model lain di menu.";
     if (status === 429) {
       let delay = "";
       for (const det of (err?.details || [])) {
@@ -2017,10 +2150,6 @@ header{position:relative;z-index:8}
     return msg || "Terjadi kesalahan jaringan. Periksa koneksi internet.";
   }
 
-  // =====================================================
-  // Bangun request — SEMUA lewat Cloudflare Worker
-  // API key disimpan di Worker (env secret), bukan di sini
-  // =====================================================
   function buildReq(msgs, model) {
     if (model[4] === "gemini") {
       return {
@@ -2063,7 +2192,10 @@ header{position:relative;z-index:8}
     if (isOR)     return { url: WORKER_BASE + "/openrouter/api/v1/chat/completions", headers, body: JSON.stringify(payload) };
     if (isZro)    return { url: WORKER_BASE + "/zro/v1/chat/completions", headers, body: JSON.stringify(payload) };
     if (model[4] === "pollinations") return { url: WORKER_BASE + "/pollinations/v1/chat/completions", headers, body: JSON.stringify(payload) };
+    if (model[4] === "nvidia") return { url: WORKER_BASE + "/nvidia/v1/chat/completions", headers, body: JSON.stringify(payload) };
     if (model[4] === "mistral")      return { url: WORKER_BASE + "/mistral/v1/chat/completions", headers, body: JSON.stringify(payload) };
+    if (model[4] === "cloudflare")   return { url: WORKER_BASE + "/cloudflare/v1/chat/completions", headers, body: JSON.stringify(payload) };
+    if (model[4] === "coarena")      return { url: WORKER_BASE + "/coarena/chat/completions", headers, body: JSON.stringify(payload) };
     return { url: WORKER_BASE + "/inferx/endpoints/v1/chat/completions", headers, body: JSON.stringify(payload) };
   }
 
@@ -2099,7 +2231,7 @@ header{position:relative;z-index:8}
 
     const model = curModel();
     if (images.length && !model[5]) {
-      alert("Model " + model[1] + " belum bisa membaca gambar. Pilih model yang mendukung vision (Qwen 3.8, Nemotron Super VL, atau Gemini), atau hapus lampirannya.");
+      alert("Model " + model[1] + " belum bisa membaca gambar. Pilih model yang mendukung vision (Qwen 3.8, Nemotron Super VL, Llama 4 Scout, atau Gemini), atau hapus lampirannya.");
       return;
     }
 
@@ -2259,4 +2391,4 @@ header{position:relative;z-index:8}
 })();
 </script>
 </body>
-  </html>
+</html>
