@@ -259,6 +259,195 @@ header{position:relative;z-index:8}
 .mopt.on .ck{opacity:1}
 
 .scrim{display:none}
+
+/* ============================================================
+   ABOUT ELARA — BUTTON + MODAL (SVG icons, no emoji)
+   ============================================================ */
+.keybtn.aboutbtn{margin-top:6px;border-style:dashed;background:none}
+.keybtn.aboutbtn:hover{border-style:solid;border-color:var(--accent);background:var(--surface)}
+
+.about-overlay{
+  position:fixed; inset:0; background:rgba(0,0,0,.78);
+  display:none; z-index:250; padding:20px;
+  -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
+}
+.about-overlay.show{display:grid; place-items:center; animation:aboutIn .2s ease}
+@keyframes aboutIn{from{opacity:0}to{opacity:1}}
+.about-box{
+  position:relative; background:var(--surface); border:1px solid var(--line);
+  border-radius:20px; width:100%; max-width:880px; max-height:92dvh;
+  display:flex; flex-direction:column; overflow:hidden;
+  box-shadow:0 24px 60px rgba(0,0,0,.5);
+}
+.about-close{
+  position:absolute; top:14px; right:14px; z-index:5;
+  width:38px; height:38px; border-radius:50%;
+  border:1px solid var(--line); background:var(--surface);
+  color:var(--ink); display:grid; place-items:center; cursor:pointer;
+  transition:border-color .15s, color .15s, transform .2s;
+}
+.about-close svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.about-close:hover{border-color:var(--err); color:var(--err); transform:rotate(90deg)}
+.about-content{
+  padding:38px 32px 40px; overflow-y:auto;
+  scrollbar-width:thin; scrollbar-color:color-mix(in srgb,var(--accent) 60%,transparent) transparent;
+}
+.about-content::-webkit-scrollbar{width:10px}
+.about-content::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--accent) 60%,transparent); border-radius:5px; border:2px solid var(--surface)}
+.about-content::-webkit-scrollbar-track{background:transparent}
+.about-h{
+  font-family:var(--serif); font-size:clamp(26px, 4vw, 34px);
+  font-weight:400; line-height:1.1; letter-spacing:-.02em; margin-bottom:8px;
+}
+.about-h em{font-style:italic; color:var(--accent)}
+.about-lead{color:var(--muted); font-size:15px; margin-bottom:28px; max-width:60ch; line-height:1.65}
+
+.about-sec{margin-top:34px}
+.about-sec:first-of-type{margin-top:0}
+.about-sec h3{
+  font-family:var(--serif); font-size:19px; font-weight:600;
+  display:flex; align-items:center; gap:10px; margin-bottom:14px;
+  padding-bottom:9px; border-bottom:1px solid var(--line);
+}
+.about-sec h3 .em{
+  display:inline-grid; place-items:center; width:30px; height:30px;
+  border-radius:9px; background:color-mix(in srgb,var(--accent) 16%,transparent);
+  color:var(--accent); flex:none;
+}
+.about-sec h3 .em svg{
+  width:16px; height:16px; stroke:currentColor; fill:none;
+  stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round;
+}
+.about-sec p{margin-bottom:10px; line-height:1.68; color:var(--ink)}
+.about-sec ul,.about-sec ol{padding-left:24px; margin-bottom:10px}
+.about-sec li{margin-bottom:6px; line-height:1.65}
+.about-sec strong{color:var(--ink); font-weight:600}
+.about-sec a{color:var(--accent); text-decoration:underline; text-underline-offset:2px}
+.about-sec a:hover{filter:brightness(1.18)}
+.about-sec code{
+  background:var(--code); color:#e9eee9;
+  padding:2px 7px; border-radius:5px; font:12.5px ui-monospace,Consolas,monospace;
+  border:1px solid var(--line); white-space:nowrap;
+}
+
+.bio-card{
+  display:flex; gap:16px; align-items:flex-start;
+  padding:16px; background:var(--bg); border-radius:14px;
+  border:1px solid var(--line); margin-bottom:14px;
+}
+.bio-avatar{
+  width:56px; height:56px; border-radius:50%;
+  background:var(--avatar) center/cover no-repeat,var(--accent);
+  flex:none; box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 55%,transparent);
+}
+.bio-info{flex:1; min-width:0}
+.bio-info b{font-size:16px; display:block; margin-bottom:2px}
+.bio-info small{color:var(--muted); font-size:12.5px; display:block; line-height:1.4}
+.bio-meta{display:flex; flex-wrap:wrap; gap:6px; margin-top:10px}
+.bio-tag{
+  display:inline-flex; align-items:center; gap:5px;
+  padding:3px 10px; border-radius:20px;
+  background:color-mix(in srgb,var(--accent) 12%,transparent);
+  color:var(--accent); font-size:11.5px; font-weight:600;
+  border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);
+}
+.bio-tag svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+.prov-grid{
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+  gap:10px; margin-top:6px;
+}
+.prov-card{
+  padding:12px 14px; background:var(--bg); border-radius:10px;
+  border:1px solid var(--line); transition:border-color .15s, transform .15s;
+}
+.prov-card:hover{border-color:var(--accent); transform:translateY(-1px)}
+.prov-card b{display:block; font-size:13.5px; margin-bottom:3px}
+.prov-card small{display:block; font-size:11.5px; color:var(--muted); margin-bottom:7px; line-height:1.45}
+.prov-card a{
+  font-size:11.5px; color:var(--accent); text-decoration:none;
+  display:inline-flex; align-items:center; gap:3px;
+}
+.prov-card a:hover{text-decoration:underline}
+.prov-card .nokey{font-size:11.5px;color:var(--muted);font-style:italic}
+
+.mdl-list{display:grid; gap:6px; margin-top:4px}
+.mdl-prov-h{
+  font-size:11.5px; font-weight:700; letter-spacing:.05em;
+  text-transform:uppercase; color:var(--muted);
+  margin:14px 0 6px; padding-left:2px;
+}
+.mdl-prov-h:first-child{margin-top:0}
+.mdl-item{
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  padding:8px 12px; background:var(--bg); border-radius:8px;
+  border:1px solid var(--line); font-size:13px;
+}
+.mdl-item b{font-weight:600}
+.mdl-item .meta{margin-left:auto; display:flex; gap:5px; align-items:center}
+.mdl-item .vision-tag{
+  font-size:10px; font-weight:700; padding:2px 7px; border-radius:10px;
+  color:#7ab8ff; border:1px solid color-mix(in srgb,#7ab8ff 40%,transparent);
+  background:color-mix(in srgb,#7ab8ff 10%,transparent);
+  letter-spacing:.03em; text-transform:uppercase;
+}
+
+.steps{counter-reset:step; list-style:none; padding-left:0 !important}
+.steps li{
+  position:relative; padding-left:38px; counter-increment:step;
+  margin-bottom:13px !important; line-height:1.65;
+}
+.steps li::before{
+  content:counter(step);
+  position:absolute; left:0; top:1px;
+  width:26px; height:26px; border-radius:50%;
+  background:var(--accent); color:var(--accent-ink);
+  display:grid; place-items:center; font-size:12px; font-weight:700;
+}
+
+.lic-list{display:grid; gap:8px; margin-top:6px}
+.lic-item{
+  display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+  padding:10px 14px; background:var(--bg); border-radius:10px;
+  border:1px solid var(--line); font-size:13px;
+}
+.lic-badge{
+  padding:3px 10px; border-radius:6px; font-size:10.5px;
+  font-weight:700; letter-spacing:.04em; text-transform:uppercase;
+  flex:none; border:1px solid;
+}
+.lic-mit{color:#a3e635; border-color:color-mix(in srgb,#a3e635 45%,transparent); background:color-mix(in srgb,#a3e635 12%,transparent)}
+.lic-bsd{color:#7ab8ff; border-color:color-mix(in srgb,#7ab8ff 45%,transparent); background:color-mix(in srgb,#7ab8ff 12%,transparent)}
+.lic-custom{color:#e8bc6c; border-color:color-mix(in srgb,#e8bc6c 45%,transparent); background:color-mix(in srgb,#e8bc6c 12%,transparent)}
+.lic-item b{font-weight:600}
+.lic-item .sub{color:var(--muted); font-size:12px; margin-left:auto}
+
+.callout{
+  padding:12px 16px; border-radius:10px; margin:12px 0;
+  border-left:3px solid var(--accent);
+  background:color-mix(in srgb,var(--accent) 8%,var(--bg));
+  font-size:13.5px; line-height:1.65;
+}
+.callout.warn{border-left-color:var(--err); background:color-mix(in srgb,var(--err) 8%,var(--bg))}
+.callout strong{display:block; margin-bottom:3px}
+
+.about-foot{
+  margin-top:38px; padding-top:22px;
+  border-top:1px solid var(--line);
+  text-align:center; color:var(--muted); font-size:12.5px; line-height:1.8;
+}
+.about-foot .heart{
+  display:inline-block; width:12px; height:12px; vertical-align:-2px;
+  color:var(--err); fill:currentColor; stroke:none;
+}
+.about-foot .ver{
+  display:inline-block; padding:2px 10px; border-radius:20px;
+  background:color-mix(in srgb,var(--accent) 12%,transparent);
+  color:var(--accent); font-size:11px; font-weight:700;
+  border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);
+  margin-bottom:8px;
+}
+
 @media (max-width:760px){
   aside{position:fixed;inset:0 auto 0 0;z-index:20;transform:translateX(-100%);width:min(82vw,300px)}
   body.open aside{transform:none}
@@ -266,6 +455,12 @@ header{position:relative;z-index:8}
   #menu{display:grid}
   .card{min-height:0}
   .scroll-btn{right:16px;bottom:calc(var(--fh,90px) + 12px)}
+
+  .about-overlay{padding:0}
+  .about-box{border-radius:0; max-height:100dvh; height:100dvh; border:none}
+  .about-content{padding:56px 20px 36px}
+  .about-close{top:12px; right:12px}
+  .about-sec h3{font-size:17px}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -278,6 +473,10 @@ header{position:relative;z-index:8}
   <div class="search"><input id="q" type="search" placeholder="Cari obrolan…" aria-label="Cari obrolan" autocomplete="off" /></div>
   <div id="list"></div>
   <button class="keybtn" id="keyOpen" type="button" style="display:none"><svg viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3M14 9l2 2"/></svg><span>Masukkan API key</span><i></i></button>
+  <button class="keybtn aboutbtn" id="aboutOpen" type="button">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg>
+    <span>Tentang Elara</span>
+  </button>
 </aside>
 <div class="scrim" id="scrim"></div>
 
@@ -355,6 +554,226 @@ header{position:relative;z-index:8}
   </div>
 </div>
 
+<!-- ============================================================
+     ABOUT ELARA MODAL — ALL SVG, NO EMOJI
+     ============================================================ -->
+<div class="about-overlay" id="aboutModal" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
+  <div class="about-box">
+    <button class="about-close" id="aboutClose" type="button" aria-label="Tutup">
+      <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+    <div class="about-content" id="aboutContent">
+
+      <h2 class="about-h" id="aboutTitle">Tentang <em>Elara</em></h2>
+      <p class="about-lead">
+        Asisten AI pribadi yang dibangun dengan penuh dedikasi oleh kumunitas, dari Indonesia,
+        dalam waktu <strong>2–3 hari</strong>. Ringan, cepat, lengkap, dan tanpa framework berat.
+      </p>
+
+      <!-- ============ PENCIPTA ============ -->
+      <div class="about-sec">
+        <h3><span class="em"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/></svg></span>Pencipta</h3>
+        <div class="bio-card">
+          <div class="bio-avatar" aria-hidden="true"></div>
+          <div class="bio-info">
+            <b>Gilang Armanda Putra</b>
+            <small>Pencipta · Developer · Arsitek Sistem</small>
+            <div class="bio-meta">
+              <span class="bio-tag"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>19 tahun</span>
+              <span class="bio-tag"><svg viewBox="0 0 24 24"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>Lulusan SMK</span>
+              <span class="bio-tag"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Indonesia</span>
+              <span class="bio-tag"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z"/></svg>2–3 hari</span>
+            </div>
+          </div>
+        </div>
+        <p>
+          Elara bukan produk perusahaan besar — ia lahir dari rasa penasaran dan kerja keras
+          <strong>Gilang Armanda Putra</strong>, seorang pemuda 19 tahun, lulusan SMK,
+          yang membangun seluruh sistem ini dalam waktu <strong>hanya 2–3 hari</strong>.
+          Mulai dari desain antarmuka, pemilihan arsitektur, orkestrasi puluhan model AI,
+          hingga lapisan keamanan — semuanya dirancang dan ditulis sendiri.
+        </p>
+        <p>
+          Tujuannya sederhana: menghadirkan asisten AI yang <strong>cepat, bisa diandalkan,
+          dan tetap ringan</strong> — tanpa iklan, tanpa pelacakan, tanpa biaya untuk pengguna.
+        </p>
+      </div>
+
+      <!-- ============ ARSITEKTUR ============ -->
+      <div class="about-sec">
+        <h3><span class="em"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></span>Arsitektur &amp; Teknologi</h3>
+        <p>
+          Elara dibangun dengan pendekatan <em>single-file application</em> — seluruh
+          antarmuka, logika, dan state manajer berada dalam satu file HTML. Tanpa bundler,
+          tanpa <code>npm install</code>, tanpa framework. Cukup buka di browser, langsung jalan.
+        </p>
+        <ul>
+          <li><strong>Frontend</strong> — HTML5 + CSS3 vanilla (custom properties, grid, flexbox), JavaScript ES2020+, tanpa dependency runtime.</li>
+          <li><strong>Backend / Proxy</strong> — Cloudflare Workers (serverless edge runtime), sebagai perisai antara browser dan penyedia AI.</li>
+          <li><strong>Streaming</strong> — Server-Sent Events (SSE) dari setiap provider, di-parse bertahap agar jawaban muncul seolah diketik.</li>
+          <li><strong>Penyimpanan</strong> — <code>localStorage</code> di sisi klien untuk riwayat chat, preferensi model, tema, dan (opsional) API key milik pengguna.</li>
+          <li><strong>Render</strong> — Markdown parser buatan sendiri, plus KaTeX untuk matematika dan highlight.js untuk blok kode.</li>
+        </ul>
+        <div class="callout">
+          <strong>Mengapa pakai Cloudflare Worker sebagai proxy?</strong>
+          Karena kunci API tidak boleh bocor ke browser. Browser hanya bicara ke Worker;
+          Worker yang menyisipkan rahasia dan meneruskan permintaan ke provider asli.
+          Bonusnya: menghindari CORS, rotasi otomatis, dan menyembunyikan infrastruktur.
+        </div>
+      </div>
+
+      <!-- ============ PROVIDER ============ -->
+      <div class="about-sec">
+        <h3><span class="em"><svg viewBox="0 0 24 24"><path d="M9 2v6M15 2v6M6 8h12v4a6 6 0 0 1-12 0V8zM12 18v4"/></svg></span>Provider AI yang Digunakan</h3>
+        <p>
+          Elara tidak bergantung pada satu penyedia. Ia bisa berpindah antar
+          <strong>10 penyedia AI</strong> hanya dengan memilih dari dropdown model.
+          Jika satu provider sedang sibuk atau down, kamu tinggal ganti ke yang lain.
+        </p>
+        <div class="prov-grid">
+          <div class="prov-card"><b>Google Gemini</b><small>Model Gemini generasi terbaru, gratis dengan kuota harian.</small><a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">aistudio.google.com/apikey</a></div>
+          <div class="prov-card"><b>Groq</b><small>Inferensi LPU super cepat, banyak model open-weight gratis.</small><a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer">console.groq.com/keys</a></div>
+          <div class="prov-card"><b>OpenRouter</b><small>Router multi-model, banyak varian :free.</small><a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer">openrouter.ai/keys</a></div>
+          <div class="prov-card"><b>NVIDIA NIM</b><small>Model Nemotron kelas flagship, konteks panjang.</small><a href="https://build.nvidia.com" target="_blank" rel="noopener noreferrer">build.nvidia.com</a></div>
+          <div class="prov-card"><b>Mistral AI</b><small>Codestral &amp; Mistral Nemo — kuat untuk coding.</small><a href="https://console.mistral.ai/api-keys" target="_blank" rel="noopener noreferrer">console.mistral.ai/api-keys</a></div>
+          <div class="prov-card"><b>InferX</b><small>Model DeepSeek, GLM, Gemma, Devstral dengan promo gratis.</small><a href="https://model.inferx.net" target="_blank" rel="noopener noreferrer">model.inferx.net</a></div>
+          <div class="prov-card"><b>Zro MoonMath</b><small>DeepSeek V4.1 Flash dengan reasoning, paket gratis harian.</small><a href="https://zro.moonmath.ai" target="_blank" rel="noopener noreferrer">zro.moonmath.ai</a></div>
+          <div class="prov-card"><b>Cloudflare Workers AI</b><small>Model open-weight gratis di edge, tanpa API key terpisah.</small><a href="https://developers.cloudflare.com/workers-ai/" target="_blank" rel="noopener noreferrer">workers-ai docs</a></div>
+          <div class="prov-card"><b>Coarena</b><small>Gateway model dengan DeepSeek, GPT, dan Gemini versi cepat.</small><span class="nokey">Akses via proxy</span></div>
+          <div class="prov-card"><b>Pollinations</b><small>GPT-OSS, GPT-5 Nano, DeepSeek Flash — tanpa ribet.</small><a href="https://enter.pollinations.ai/keys" target="_blank" rel="noopener noreferrer">enter.pollinations.ai/keys</a></div>
+        </div>
+      </div>
+
+      <!-- ============ MODEL ============ -->
+      <div class="about-sec">
+        <h3><span class="em"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M1 15h3M20 9h3M20 15h3"/></svg></span>Model AI yang Tersedia</h3>
+        <p>
+          Daftar model di bawah ini <em>dibangun otomatis dari katalog aplikasi</em> —
+          jadi selalu sesuai dengan apa yang sedang aktif. Tag <strong>Fast</strong>,
+          <strong>Mid</strong>, <strong>Slow</strong>, dan <strong>Busy</strong>
+          menandakan perkiraan latensi &amp; tingkat kesibukan.
+        </p>
+        <div id="aboutModels"></div>
+      </div>
+
+      <!-- ============ KEAMANAN ============ -->
+      <div class="about-sec">
+        <h3><span class="em"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></span>Keamanan &amp; Privasi</h3>
+        <ul>
+          <li><strong>API key tidak pernah bocor</strong> — semua key utama disimpan sebagai <em>Secret</em> di environment Cloudflare Worker, bukan di HTML.</li>
+          <li><strong>Mode fallback</strong> — jika kamu ingin memakai key sendiri, isian di modal "API key" hanya disimpan di <code>localStorage</code> browser kamu dan dikirim langsung ke provider. Tidak pernah menyentuh server Elara.</li>
+          <li><strong>Tanpa pelacakan</strong> — tidak ada analytics, tidak ada cookie pihak ketiga, tidak ada telemetri.</li>
+          <li><strong>Data tetap milikmu</strong> — seluruh riwayat obrolan tersimpan lokal dan bisa kamu hapus kapan saja.</li>
+          <li><strong>Sanitasi HTML</strong> — semua jawaban model di-escape sebelum dirender, mencegah injeksi skrip.</li>
+        </ul>
+        <div class="callout warn">
+          <strong>Catatan penting</strong>
+          Elara hanyalah antarmuka. Jawaban sepenuhnya berasal dari model AI pihak ketiga
+          dan bisa saja keliru. Selalu verifikasi informasi penting dari sumber terpercaya.
+        </div>
+      </div>
+
+      <!-- ============ CARA PAKAI ============ -->
+      <div class="about-sec">
+        <h3><span class="em"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>Cara Pakai (untuk Pengguna)</h3>
+        <ol class="steps">
+          <li><strong>Pilih model</strong> — klik tombol model di pojok kanan atas header, pilih provider &amp; model sesuai kebutuhan.</li>
+          <li><strong>Ketik pertanyaan</strong> di kolom pesan bawah. Tekan <code>Enter</code> untuk kirim, <code>Shift+Enter</code> untuk baris baru.</li>
+          <li><strong>Lampirkan gambar</strong> (opsional) — klik ikon klip. Model dengan tag <em>Vision</em> bisa membacanya.</li>
+          <li><strong>Kelola obrolan</strong> — hover item di sidebar untuk sematkan, ganti nama, atau hapus. Di HP, <em>swipe kiri</em> item obrolan untuk memunculkan konfirmasi hapus.</li>
+          <li><strong>Edit pesan terakhir</strong> — klik tombol "Edit" di pesanmu untuk memperbaiki &amp; mengirim ulang.</li>
+          <li><strong>Regenerasi jawaban</strong> — tombol "Ulangi" di bawah jawaban terakhir.</li>
+          <li><strong>Ganti tema</strong> — klik ikon bulan/matahari di header. Pilihan tema disimpan otomatis.</li>
+          <li><strong>Shortcut</strong> — <code>Ctrl/Cmd + K</code> untuk obrolan baru, <code>Esc</code> untuk menutup menu/modal.</li>
+        </ol>
+      </div>
+
+      <!-- ============ SETUP CLOUDFLARE ============ -->
+      <div class="about-sec">
+        <h3><span class="em"><svg viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg></span>Setup Cloudflare Proxy (untuk Developer)</h3>
+        <p>
+          Ingin <em>fork</em> Elara dan hosting sendiri? Berikut jalur cepat untuk
+          menyiapkan proxy Cloudflare Worker yang menyembunyikan API key.
+        </p>
+        <ol class="steps">
+          <li>Buat akun gratis di <a href="https://dash.cloudflare.com/sign-up" target="_blank" rel="noopener noreferrer">dash.cloudflare.com</a>.</li>
+          <li>Buka menu <strong>Workers &amp; Pages → Create → Worker</strong>, beri nama misal <code>elara-proxy</code>.</li>
+          <li>Edit Worker, tempel skrip proxy-mu — buat router sederhana yang meneruskan <code>/groq/*</code>, <code>/gemini/*</code>, <code>/openrouter/*</code>, dst. ke endpoint provider masing-masing.</li>
+          <li>Buka tab <strong>Settings → Variables and Secrets</strong>, tambahkan secret: <code>GEMINI_KEY</code>, <code>GROQ_KEY</code>, <code>OPENROUTER_KEY</code>, <code>MISTRAL_KEY</code>, <code>INFERX_KEY</code>, <code>ZRO_KEY</code>, <code>NVIDIA_KEY</code>, <code>POLLINATIONS_KEY</code>. Nilai <strong>jangan</strong> ditulis di kode — hanya di sini.</li>
+          <li>Deploy Worker → salin URL-nya (contoh <code>https://elara-proxy.username.workers.dev</code>).</li>
+          <li>Di file HTML Elara, cari baris <code>const WORKER_BASE = "..."</code>, ganti dengan URL Worker-mu.</li>
+          <li>Buka Elara di browser — selesai. Semua panggilan AI kini lewat proxy-mu sendiri.</li>
+        </ol>
+        <div class="callout">
+          <strong>Tips</strong>
+          Aktifkan <em>rate limiting</em> di Worker (mis. 30 req/menit per IP) supaya
+          tidak disalahgunakan orang lain saat URL dibagikan.
+        </div>
+      </div>
+
+      <!-- ============ LISENSI ============ -->
+      <div class="about-sec">
+        <h3><span class="em"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg></span>Lisensi &amp; Atribusi</h3>
+        <p>
+          Elara berdiri di atas kerja keras komunitas <em>open-source</em>. Berikut
+          komponen yang dipakai beserta lisensinya:
+        </p>
+        <div class="lic-list">
+          <div class="lic-item"><span class="lic-badge lic-mit">MIT</span><b>Elara (kode aplikasi)</b><span class="sub">© Gilang Armanda Putra</span></div>
+          <div class="lic-item"><span class="lic-badge lic-mit">MIT</span><b>KaTeX v0.16.9</b><span class="sub">katex.org — render matematika</span></div>
+          <div class="lic-item"><span class="lic-badge lic-bsd">BSD-3</span><b>highlight.js v11.9.0</b><span class="sub">highlightjs.org — syntax highlighting</span></div>
+          <div class="lic-item"><span class="lic-badge lic-mit">MIT</span><b>Cloudflare Workers Runtime</b><span class="sub">workers.cloudflare.com</span></div>
+          <div class="lic-item"><span class="lic-badge lic-custom">ToS</span><b>Model AI (Gemini, Groq, OpenRouter, dll.)</b><span class="sub">Tunduk pada syarat &amp; ketentuan masing-masing penyedia</span></div>
+          <div class="lic-item"><span class="lic-badge lic-mit">MIT</span><b>Ikon SVG</b><span class="sub">Dibuat manual inline — bebas dipakai ulang</span></div>
+        </div>
+      </div>
+
+      <!-- ============ BIAYA ============ -->
+      <div class="about-sec">
+        <h3><span class="em"><svg viewBox="0 0 24 24"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg></span>Kredit, Biaya &amp; Kuota</h3>
+        <p>
+          Elara <strong>sepenuhnya gratis</strong> untuk pengguna. Tidak ada langganan,
+          tidak ada iklan, tidak ada paywall tersembunyi. Semua biaya ditanggung
+          lewat <em>free tier</em> masing-masing provider:
+        </p>
+        <ul>
+          <li><strong>Groq</strong> — gratis dengan rate limit harian.</li>
+          <li><strong>OpenRouter</strong> — model bertanda <code>:free</code> gratis, kadang antre.</li>
+          <li><strong>Google Gemini</strong> — kuota gratis harian dari AI Studio.</li>
+          <li><strong>Cloudflare Workers AI</strong> — kuota gratis bulanan.</li>
+          <li><strong>Zro MoonMath</strong> — free plan reset tiap hari.</li>
+          <li><strong>InferX</strong> — promo gratis 100% untuk periode terbatas.</li>
+          <li><strong>Pollinations</strong> — akses gratis via key sekunder.</li>
+          <li><strong>NVIDIA NIM</strong> &amp; <strong>Mistral</strong> — free tier untuk eksperimen.</li>
+        </ul>
+        <p style="color:var(--muted);font-size:13px">
+          Jika ingin performa lebih stabil atau model premium, kamu bisa mendaftar langsung
+          ke provider dan memasukkan API key sendiri lewat tombol "Masukkan API key" di sidebar.
+        </p>
+      </div>
+
+      <!-- ============ KREDIT ============ -->
+      <div class="about-sec">
+        <h3><span class="em"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span>Terima Kasih</h3>
+        <p>Elara tidak akan ada tanpa:</p>
+        <ul>
+          <li><strong>Cloudflare</strong> — edge runtime yang menyediakan proxy gratis.</li>
+          <li><strong>Google, Groq, OpenRouter, NVIDIA, Mistral, InferX, Zro, Pollinations, Coarena</strong> — yang membuka akses model AI ke publik.</li>
+          <li><strong>Komunitas open-source</strong> — KaTeX, highlight.js, dan ribuan kontributor yang tak terlihat.</li>
+          <li><strong>Kamu</strong> — yang sudah memakai, menguji, dan memberi masukan.</li>
+        </ul>
+      </div>
+
+   <div class="about-foot">
+  <div class="ver">Elara v2.0</div>
+  <div>Dikembangkan secara independen · Indonesia</div>
+  <div>© <span id="aboutYear"></span> Gilang Armanda Putra · MIT License</div>
+</div>
+
+    </div>
+  </div>
+</div>
+
 <script>
 (() => {
   // ============================================================
@@ -382,7 +801,10 @@ header{position:relative;z-index:8}
     "Kamu boleh memakai tabel markdown, tautan [teks](url), kutipan (>), daftar, dan blok kode berlabel bahasa bila membantu."
   ].join("\n");
 
-    const IDEAS = [
+  // ==========================================================
+  // KOLEKSI 1000 PROMPT REKOMENDASI
+  // ==========================================================
+  const IDEAS = [
     // ================== KODING (50) ==================
     ["KODING", "Buatkan fungsi JavaScript untuk memvalidasi email dengan regex"],
     ["KODING", "Jelaskan perbedaan antara let, const, dan var di JavaScript"],
@@ -1564,41 +1986,32 @@ header{position:relative;z-index:8}
   };
 
   const MODELS = [
-    // Groq
     ["openai/gpt-oss-20b", "GPT-OSS 20B", "Paling ngebut, cocok buat tanya-jawab harian", I_WIND, "groq", false, ["fast"]],
     ["openai/gpt-oss-120b", "GPT-OSS 120B", "Lebih pintar menalar, tetap cepat", I_FLAME, "groq", false, ["fast"]],
     ["qwen/qwen3.8-27b", "Qwen 3.8 27B", "Bisa baca teks dan gambar sekaligus", I_SPARK, "groq", true, ["fast"]],
-    // NVIDIA
     ["nvidia/nemotron-3-ultra-550b-a55b", "Nemotron 3 Ultra", "Flagship NVIDIA, nalar terkuat, konteks 1M", I_FLAME, "nvidia", false, ["slow"]],
     ["nvidia/nemotron-3.5-lightning-30b-a3b", "Nemotron 3.5 Lightning", "Versi ringan Nemotron, respons gesit", I_WIND, "nvidia", false, ["fast"]],
     ["poolside/laguna-xs-2.1", "Laguna XS 2.1", "Dirancang buat coding dan tugas teknis", I_BOLT, "nvidia", false, ["mid"]],
     ["nvidia/nemotron-3-nano-omni-30b-a3b-reasoning", "Nemotron 3 Nano Omni", "Mikir dulu sebelum menjawab, ukuran sedang", I_CHIP, "nvidia", false, ["mid"]],
     ["nvidia/nemotron-3.5-super-vl-120b-a12b", "Nemotron 3.5 Super VL", "Bisa lihat gambar, versi early access", I_SPARK, "nvidia", false, ["mid"]],
     ["nvidia/nemotron-3.5-bolt-e4b", "Nemotron 3.5 Bolt E4B", "Nemotron kecil, sangat ngebut tapi sederhana", I_BOLT, "nvidia", false, ["fast"]],
-    // OpenRouter
     ["nvidia/nemotron-3-ultra-550b-a55b:free", "Nemotron 3 Ultra", "Nalar terkuat, konteks 1M, agak lama mikir", I_FLAME, "openrouter", false, ["slow"]],
     ["baidu/ernie-5.5-flash-preview:free", "ERNIE 5.5 Flash", "Cepat dengan konteks 1M, sering antre", I_BOLT, "openrouter", false, ["busy"]],
     ["nvidia/nemotron-3.5-super-vl:free", "Nemotron 3.5 Super VL", "Bisa baca gambar dan video, konteks 1M", I_SPARK, "openrouter", true, ["slow"]],
     ["recursive/flint-v1.0:free", "Flint 1.0", "Jago ngoding sebagai agent, konteks 262K", I_BOLT, "openrouter", false, ["busy"]],
     ["liquid/lfm-3-1.7b:free", "LFM 3 1.7B", "Mungil dan irit, buat tugas ringan", I_WIND, "openrouter", false, ["busy"]],
     ["openrouter/free", "Auto (Free Router)", "Otomatis pilih model gratis yang lagi lowong", I_CHIP, "openrouter", false, ["busy"]],
-    // Zro
     ["deepseek-v4.1-flash", "DeepSeek V4.1 Flash", "Mikir dulu baru jawab, paket gratis", I_FLAME, "zro", false, ["slow"]],
-    // Gemini
     ["gemini-3.5-flash-lite", "3.5 Flash-Lite", "Cepat, ringan, dan bisa baca gambar", I_LEAF, "gemini", true, ["busy"]],
-    // Cloudflare (3 model)
     ["@cf/openai/gpt-oss-120b", "GPT-OSS 120B", "Flagship open-weight, gratis di Workers AI", I_FLAME, "cloudflare", false, ["mid"]],
     ["@cf/meta/llama-3.3-70b-instruct-fp8-fast", "Llama 3.3 70B", "Cepat dan mumpuni, konteks panjang", I_WIND, "cloudflare", false, ["fast"]],
     ["@cf/meta/llama-4-scout-17b-16e-instruct", "Llama 4 Scout", "Bisa baca gambar, cepat", I_SPARK, "cloudflare", true, ["fast"]],
-    // Coarena (3 model)
     ["deepseek-v4-1-flash-1017", "DeepSeek V4.1 Flash", "Cepat dan hemat, paket gratis", I_FLAME, "coarena", false, ["fast"]],
     ["gpt-6-luna", "GPT-6 Luna", "Model OpenAI, cepat dan efisien", I_SPARK, "coarena", false, ["fast"]],
     ["gemini-3-8-flash", "Gemini 3.8 Flash", "Model Google yang cepat", I_LEAF, "coarena", false, ["fast"]],
-    // Pollinations
     ["openai/gpt-5.4-nano", "GPT-5.4 Nano", "Ringan dan hemat buat obrolan santai", I_BOLT, "pollinations", false, ["mid"]],
     ["openai/gpt-oss-20b", "GPT-OSS 20B", "Open-weight, tanpa ribet", I_WIND, "pollinations", false, ["mid"]],
     ["deepseek/deepseek-v4-flash", "DeepSeek V4 Flash", "Cepat dan hemat, bagus buat penalaran", I_FLAME, "pollinations", false, ["mid"]],
-    // InferX
     ["deepseek-v4-flash-0731", "DeepSeek V4 Flash", "Cepat dan gratis", I_BOLT, "inferx", false, ["busy"]],
     ["deepseek-v4.1-flash-1017", "DeepSeek V4.1 Flash", "Versi terbaru, promo gratis 100%", I_FLAME, "inferx", false, ["busy"]],
     ["Agents-A1", "Agents A1", "Dirancang khusus buat tugas agent", I_SPARK, "inferx", false, ["busy"]],
@@ -1606,7 +2019,6 @@ header{position:relative;z-index:8}
     ["Devstral-2-123B-Instruct-2512-int4-AutoRound", "Devstral 2 123B", "Spesialis coding berukuran besar", I_BOLT, "inferx", false, ["busy"]],
     ["glm-5.3-flash", "GLM 5.3 Flash", "Respons cepat, serba bisa", I_WIND, "inferx", false, ["busy"]],
     ["glm-5.3", "GLM 5.3", "Penalaran mendalam buat soal rumit", I_CHIP, "inferx", false, ["busy"]],
-    // Mistral
     ["codestral-latest", "Codestral", "Khusus coding, paham banyak bahasa pemrograman", I_BOLT, "mistral", false, ["mid"]],
     ["open-mistral-nemo", "Mistral Nemo", "12B, ringan tapi seimbang", I_LEAF, "mistral", false, ["mid"]]
   ];
@@ -2388,6 +2800,64 @@ header{position:relative;z-index:8}
 
   $("q").addEventListener("input", drawList);
   setBusy(false); drawAll();
+
+  // ============================================================
+  // ============ MODAL TENTANG ELARA ============
+  // ============================================================
+  const aboutModal = $("aboutModal");
+  const aboutContent = $("aboutContent");
+  let aboutModelsBuilt = false;
+
+  function buildAboutModels() {
+    if (aboutModelsBuilt) return;
+    aboutModelsBuilt = true;
+    const container = $("aboutModels");
+    if (!container) return;
+
+    const byProv = {};
+    MODELS.forEach(m => {
+      if (!byProv[m[4]]) byProv[m[4]] = [];
+      byProv[m[4]].push(m);
+    });
+
+    let html = "";
+    Object.keys(byProv).forEach(prov => {
+      html += '<div class="mdl-prov-h">' + (PNAME[prov] || prov) + '</div>';
+      html += '<div class="mdl-list">';
+      byProv[prov].forEach(m => {
+        const tags = (m[6] || [])
+          .map(t => {
+            const meta = TAG_META[t];
+            return meta ? '<span class="tag ' + meta.cls + '">' + meta.label + '</span>' : "";
+          }).join("");
+        const vision = m[5] ? '<span class="vision-tag">Vision</span>' : "";
+        html += '<div class="mdl-item"><b>' + m[1] + '</b><div class="meta">' + vision + tags + '</div></div>';
+      });
+      html += '</div>';
+    });
+
+    container.innerHTML = html;
+
+    const yr = $("aboutYear");
+    if (yr) yr.textContent = new Date().getFullYear();
+  }
+
+  function openAbout() {
+    closeSide();
+    aboutModal.classList.add("show");
+    aboutContent.scrollTop = 0;
+    buildAboutModels();
+  }
+  function closeAbout() {
+    aboutModal.classList.remove("show");
+  }
+
+  $("aboutOpen").onclick = openAbout;
+  $("aboutClose").onclick = closeAbout;
+  aboutModal.onclick = e => { if (e.target === aboutModal) closeAbout(); };
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && aboutModal.classList.contains("show")) closeAbout();
+  });
 })();
 </script>
 </body>
