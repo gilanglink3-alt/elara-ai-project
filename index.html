@@ -51,12 +51,12 @@ const applyAvatar = t => document.documentElement.style.setProperty("--avatar", 
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{overflow-x:hidden}
 html{scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--accent) 60%,transparent) transparent}
-body{background:var(--bg);color:var(--ink);font:15px/1.65 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif;padding-bottom:env(safe-area-inset-bottom);transition:opacity .22s}
-body.leaving{opacity:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.65 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif;padding-bottom:env(safe-area-inset-bottom)}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 strong{font-weight:700}
 .ic{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
-.av{width:30px;height:30px;border-radius:50%;background:var(--avatar) center/cover no-repeat,var(--accent);color:transparent;overflow:hidden;display:block;font-size:0;flex:none;box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 55%,transparent)}
+/* logo: span kosong, tanpa teks, jadi tidak ada huruf yang bisa bocor di luar lingkaran */
+.av{width:30px;height:30px;border-radius:50%;background:var(--avatar) center/cover no-repeat;overflow:hidden;display:block;flex:none;font-size:0;line-height:0;clip-path:circle(50%);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 22%,transparent)}
 .wrap{max-width:920px;margin:0 auto;padding:0 20px;min-width:0}
 section{padding:96px 0;border-top:1px solid var(--line);overflow-wrap:anywhere}
 section.alt{background:var(--side)}
@@ -72,7 +72,7 @@ h2 em,h1 em{font-style:italic;color:var(--accent)}
 .tg .ic{width:12px;height:12px}
 code{background:var(--code);color:#e9eee9;padding:2px 7px;border-radius:5px;font:12.5px ui-monospace,Consolas,monospace;border:1px solid var(--line);overflow-wrap:anywhere}
 .rv{transition:none}
-.js .rv{opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease}
+.js .rv{opacity:0;transform:translateY(10px);transition:opacity .35s ease,transform .35s ease}
 .js .rv.in{opacity:1;transform:none}
 /* bilah atas */
 .top{position:fixed;top:0;left:0;right:0;z-index:5;padding:calc(10px + env(safe-area-inset-top)) 0 10px;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
@@ -231,6 +231,18 @@ h1{font:400 clamp(36px,7.2vw,64px)/1.08 var(--serif);letter-spacing:-.02em;max-w
 .lic i{margin-left:auto;font-style:normal;font-size:12px;color:var(--muted)}
 footer{border-top:1px solid var(--line);padding:22px 20px calc(30px + env(safe-area-inset-bottom));text-align:center;font-size:12.5px;color:var(--muted);line-height:1.8}
 footer .tg{font-size:11px;font-weight:700;padding:2px 10px;margin-bottom:6px}
+/* loader: logo menyala bergantian + garis progres tipis, warna ikut tema */
+.ld{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:var(--bg);opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s}
+.ld.on{opacity:1;visibility:visible}
+.ld::before{content:"";position:absolute;top:0;left:0;height:2px;width:100%;background:var(--accent);transform:scaleX(0);transform-origin:left}
+.ld.on::before{animation:bar 2.4s cubic-bezier(.1,.6,.2,1) forwards}
+.lds{width:64px;height:64px;stroke:var(--accent);stroke-width:4.4;stroke-linecap:round;fill:none;transform:scale(.92);transition:transform .4s ease}
+.ld.on .lds{transform:none}
+.lds path{animation:spk 1.2s ease-in-out infinite}
+.ld b{font:400 22px/1 var(--serif);letter-spacing:-.01em}
+.ld small{font-size:12.5px;color:var(--muted)}
+@keyframes spk{0%,100%{opacity:.16}35%{opacity:1}}
+@keyframes bar{to{transform:scaleX(.9)}}
 @media (min-width:760px){
   .wrap{padding:0 20px}
   .sg{grid-template-columns:repeat(4,1fr)}
@@ -286,9 +298,14 @@ footer .tg{font-size:11px;font-weight:700;padding:2px 10px;margin-bottom:6px}
 
 
 <div class="scrim" id="scrim" hidden></div>
+<div class="ld" id="ld" role="status" aria-hidden="true">
+ <svg class="lds" id="lds" viewBox="0 0 64 64" aria-hidden="true"></svg>
+ <b>Elara</b>
+ <small>Menyiapkan obrolan…</small>
+</div>
 <header class="top">
  <div class="wrap">
-  <div class="brand"><span class="av" aria-hidden="true">E</span><b>Elara</b></div>
+  <div class="brand"><span class="av" aria-hidden="true"></span><b>Elara</b></div>
   <div class="mw">
    <button class="hb" id="hb" type="button" aria-label="Buka menu" aria-expanded="false" aria-controls="menu"><svg class="ic i-m" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg><svg class="ic i-x" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
    <nav class="menu" id="menu" aria-label="Akses cepat" hidden>
@@ -327,7 +344,7 @@ footer .tg{font-size:11px;font-weight:700;padding:2px 10px;margin-bottom:6px}
    <div class="pr"><span class="mb"><i><svg class="ic" aria-hidden="true"><use href="#i-wind"/></svg></i>GPT-OSS 20B<svg class="ic mu"><use href="#i-down"/></svg></span><span class="mo"><svg class="ic"><use href="#i-moon"/></svg></span></div></div>
   <div class="msgs">
    <div class="ub"><div class="bb">Jelaskan perbedaan antara let, const, dan var di JavaScript</div><div class="tm">09.41</div></div>
-   <div class="er"><span class="av">E</span><div>
+   <div class="er"><span class="av"></span><div>
     <div class="nm">Elara</div>
     <p>Perbedaannya ada di <strong>lingkup</strong> dan cara diubah:</p>
     <ul><li><code>var</code> berlingkup fungsi dan bisa dideklarasikan ulang</li><li><code>let</code> berlingkup blok dan nilainya boleh diganti</li><li><code>const</code> berlingkup blok dan tidak bisa diberi nilai baru</li></ul>
@@ -454,10 +471,10 @@ nama = <span class="s">"Lain"</span>;     <span class="c">// TypeError</span></p
  <div class="eb rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-user"/></svg></span><span class="lb">Pencipta</span></div>
  <h2 id="t-me" class="rv">Dikerjakan sendiri dalam <em>1 minggu</em></h2>
  <div class="body">
-  <div class="bio rv"><span class="av" aria-hidden="true">E</span><div><b>Gilang Armanda Putra</b><div class="sb">Pencipta dan developer</div>
+  <div class="bio rv"><span class="av" aria-hidden="true"></span><div><b>Gilang Armanda Putra</b><div class="sb">Pencipta dan developer</div>
    <div class="tags"><span class="tg"><svg class="ic"><use href="#i-cal"/></svg>19 tahun</span><span class="tg"><svg class="ic"><use href="#i-grad"/></svg>Lulusan SMK</span><span class="tg"><svg class="ic"><use href="#i-pin2"/></svg>Indonesia</span><span class="tg"><svg class="ic"><use href="#i-zap"/></svg>1 minggu</span></div></div></div>
   <p class="rv">Elara dibuat oleh <strong>Gilang Armanda Putra</strong>, 19 tahun, lulusan SMK. Seluruh sistemnya dikerjakan sendiri dalam 1 minggu, mulai dari tampilan, arsitektur, pengaturan banyak model AI, sampai keamanannya</p>
-  <p class="rv">Tujuannya sederhana: asisten AI yang cepat, bisa diandalkan, dan ringan. Tanpa iklan, tanpa pelacakan, dan gratis untuk pengguna</p>
+  <p class="rv">Tujuannya sederhan asisten AI yang cepat, bisa diandalkan, dan ringan. Tanpa iklan, tanpa pelacakan, dan gratis untuk pengguna</p>
  </div>
 </div></section>
 
@@ -609,7 +626,7 @@ const CHAT_URL = "chat.html"; // ganti sesuai lokasi aplikasi chat
     });
   }
 
-  // reveal
+  // reveal: muncul sebelum masuk layar, yang terlewati saat scroll kencang langsung tampil
   var items = document.querySelectorAll(".rv");
   if(!("IntersectionObserver" in window) || reduce){
     items.forEach(function(e){e.classList.add("in")}); count();
@@ -617,13 +634,17 @@ const CHAT_URL = "chat.html"; // ganti sesuai lokasi aplikasi chat
     var counted = false;
     var io = new IntersectionObserver(function(es){
       es.forEach(function(en){
-        if(!en.isIntersecting) return;
-        var e = en.target, i = Array.prototype.indexOf.call(e.parentNode.children, e);
-        e.style.transitionDelay = Math.min(i*60,300)+"ms";
+        var e = en.target, top = en.boundingClientRect.top;
+        if(!en.isIntersecting && top >= 0) return;
+        if(top < 0){ e.style.transition = "none"; }
+        else {
+          var i = Array.prototype.indexOf.call(e.parentNode.children, e);
+          e.style.transitionDelay = Math.min(i*40,120)+"ms";
+        }
         e.classList.add("in"); io.unobserve(e);
         if(!counted && e.classList.contains("st")){ counted = true; count(); }
       });
-    },{threshold:.12});
+    },{threshold:0, rootMargin:"0px 0px 15% 0px"});
     items.forEach(function(e){io.observe(e)});
   }
 
@@ -635,19 +656,20 @@ const CHAT_URL = "chat.html"; // ganti sesuai lokasi aplikasi chat
   sc.addEventListener("click", function(){ setMenu(false); });
   document.addEventListener("keydown", function(e){ if(e.key==="Escape" && !mn.hidden){ setMenu(false); hb.focus(); } });
 
-  // tombol: fade-out lalu pindah, prefetch sekali
+  // tombol: tampilkan loader lalu pindah, prefetch sekali
   var cta = $("#cta"); cta.setAttribute("href", CHAT_URL);
   var pf = false;
   function prefetch(){ if(pf) return; pf = true; var l = document.createElement("link"); l.rel="prefetch"; l.href=CHAT_URL; document.head.appendChild(l); }
   ["pointerenter","focus","touchstart"].forEach(function(ev){ cta.addEventListener(ev, prefetch, {passive:true}); });
+  var ld = $("#ld"); $("#lds").innerHTML = SPOKES;
+  $("#lds").querySelectorAll("path").forEach(function(p,i){ p.style.animationDelay = (-i*0.1)+"s"; });
   cta.addEventListener("click", function(e){
     if(e.ctrlKey||e.metaKey||e.shiftKey||e.button===1) return;
-    if(reduce) return;
     e.preventDefault();
-    document.body.classList.add("leaving");
-    setTimeout(function(){ location.href = CHAT_URL; }, 220);
+    ld.classList.add("on"); ld.setAttribute("aria-hidden","false");
+    setTimeout(function(){ location.href = CHAT_URL; }, 250);
   });
-  addEventListener("pageshow", function(){ document.body.classList.remove("leaving"); });
+  addEventListener("pageshow", function(){ ld.classList.remove("on"); ld.setAttribute("aria-hidden","true"); });
 })();
 </script>
 </body>
