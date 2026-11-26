@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Elara · Asisten AI Pribadi Buatan Indonesia</title>
+<meta name="description" content="Elara adalah asisten AI pribadi buatan Indonesia. Cepat, ringan, tanpa iklan, tanpa pelacakan, dan gratis. Pilih dari 10 penyedia AI dan puluhan model.">
+<meta property="og:title" content="Elara · Asisten AI Pribadi Buatan Indonesia">
+<meta property="og:description" content="Elara adalah asisten AI pribadi buatan Indonesia. Cepat, ringan, tanpa iklan, tanpa pelacakan, dan gratis.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#f5f3ec">
+<link rel="icon" id="fav" type="image/svg+xml" href="data:,">
+<script>
+/* Logo & tema: kode logo disalin apa adanya dari aplikasi */
+const SPOKES = `<path d="M32 32L32.0 10.0"/><path d="M32 32L40.0 18.1"/><path d="M32 32L51.9 20.5"/><path d="M32 32L47.0 32.0"/><path d="M32 32L50.2 42.5"/><path d="M32 32L40.5 46.7"/><path d="M32 32L32.0 55.0"/><path d="M32 32L24.0 45.9"/><path d="M32 32L12.9 43.0"/><path d="M32 32L17.0 32.0"/><path d="M32 32L13.8 21.5"/><path d="M32 32L23.5 17.3"/>`;
+const avatarFor = light => {
+  const c = light
+    ? { b1: "#eef4df", b2: "#d5e2b8", glow: "#2f6b0f", ink: "#2f6b0f", ga: ".18" }
+    : { b1: "#1d2a14", b2: "#0b0e0c", glow: "#c6f26b", ink: "#c6f26b", ga: ".28" };
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c.b1}"/><stop offset="1" stop-color="${c.b2}"/></linearGradient><radialGradient id="o" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="${c.glow}" stop-opacity="${c.ga}"/><stop offset="1" stop-color="${c.glow}" stop-opacity="0"/></radialGradient></defs><rect width="64" height="64" fill="url(#b)"/><circle cx="32" cy="32" r="30" fill="url(#o)"/><g stroke="${c.ink}" stroke-width="4.4" stroke-linecap="round" fill="none">${SPOKES}</g></svg>`;
+  return 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '")';
+};
+const applyAvatar = t => document.documentElement.style.setProperty("--avatar", avatarFor(t === "light"));
+(function(){
+  var t = "light";
+  try { if (localStorage.getItem("gv2_theme") === "dark") t = "dark"; } catch (e) {}
+  var d = document.documentElement;
+  d.setAttribute("data-theme", t);
+  d.classList.add("js");
+  applyAvatar(t);
+  document.getElementById("fav").setAttribute("href", avatarFor(t === "light").slice(5, -2));
+  document.querySelector('meta[name="theme-color"]').setAttribute("content", t === "light" ? "#f5f3ec" : "#0f1311");
+})();
+</script>
+<style>
+:root{
+  --bg:#0f1311; --side:#0b0e0c; --surface:#171c19; --ink:#e9eee9; --muted:#8d978f; --line:#252c27;
+  --accent:#c6f26b; --accent-ink:#12190a; --err:#ff8a80; --code:#0a0d0b;
+  --serif:"Iowan Old Style","Palatino Linotype",Georgia,serif;
+  --fast:#a3e635; --mid:#7ab8ff; --slow:#e8bc6c; --busy:#ff9a90; --tm:12%; --wm:.05; --glow:30%;
+  --shadow-frame:0 24px 60px rgba(0,0,0,.5); --shadow-input:0 10px 30px rgba(0,0,0,.28);
+  color-scheme:dark;
+}
+:root[data-theme="light"]{
+  --bg:#f5f3ec; --side:#ece9df; --surface:#ffffff; --ink:#1b211d; --muted:#6a736c; --line:#dcd8cc;
+  --accent:#2f6b0f; --accent-ink:#ffffff; --err:#b42318; --code:#1b211d; color-scheme:light;
+  --fast:#3f6212; --mid:#1e40af; --slow:#8a5a00; --busy:#b42318; --tm:10%; --wm:.07; --glow:22%;
+  --shadow-frame:0 16px 36px rgba(40,50,30,.18); --shadow-input:0 10px 28px rgba(40,50,30,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{overflow-x:hidden}
+html{scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--accent) 60%,transparent) transparent}
+body{background:var(--bg);color:var(--ink);font:15px/1.65 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif;padding-bottom:env(safe-area-inset-bottom);transition:opacity .22s}
+body.leaving{opacity:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+strong{font-weight:700}
+.ic{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.av{width:30px;height:30px;border-radius:50%;background:var(--avatar) center/cover no-repeat,var(--accent);color:transparent;overflow:hidden;display:block;font-size:0;flex:none;box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 55%,transparent)}
+.wrap{max-width:920px;margin:0 auto;padding:0 20px;min-width:0}
+section{padding:96px 0;border-top:1px solid var(--line);overflow-wrap:anywhere}
+section.alt{background:var(--side)}
+.eb{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.em{width:30px;height:30px;border-radius:9px;background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent);display:inline-flex;align-items:center;justify-content:center;flex:none}
+.em .ic{width:16px;height:16px}
+.lb{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+h2{font:400 clamp(26px,4vw,38px)/1.1 var(--serif);letter-spacing:-.02em;text-wrap:balance}
+h2 em,h1 em{font-style:italic;color:var(--accent)}
+.lead{color:var(--muted);max-width:60ch;margin-top:12px}
+.body{margin-top:32px}
+.tg{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:600;color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent)}
+.tg .ic{width:12px;height:12px}
+code{background:var(--code);color:#e9eee9;padding:2px 7px;border-radius:5px;font:12.5px ui-monospace,Consolas,monospace;border:1px solid var(--line);overflow-wrap:anywhere}
+.rv{transition:none}
+.js .rv{opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease}
+.js .rv.in{opacity:1;transform:none}
+/* bilah atas */
+.top{position:fixed;top:0;left:0;right:0;z-index:5;padding:calc(10px + env(safe-area-inset-top)) 0 10px;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;justify-content:space-between;align-items:center;position:relative}
+.hb{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s}
+.hb:hover{border-color:var(--accent)}
+.hb .ic{width:20px;height:20px}
+.mw{position:relative}
+.hb .i-x{display:none}
+.hb[aria-expanded="true"] .i-m{display:none}
+.hb[aria-expanded="true"] .i-x{display:block}
+.hb[aria-expanded="true"]{border-color:var(--accent);color:var(--accent)}
+.scrim{position:fixed;inset:0;z-index:4;background:color-mix(in srgb,var(--bg) 55%,transparent);backdrop-filter:blur(4px);animation:fade .2s both}
+.scrim[hidden]{display:none}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.menu{position:absolute;top:calc(100% + 18px);right:0;width:min(300px,calc(100vw - 36px));padding:10px;border:1px solid var(--line);border-radius:20px;background:var(--surface);box-shadow:var(--shadow-frame);transform-origin:top right;animation:menuIn .22s ease both}
+.menu[hidden]{display:none}
+@keyframes menuIn{from{opacity:0;transform:translateY(-6px) scale(.96)}to{opacity:1;transform:none}}
+.menu .mlb{display:block;padding:10px 12px 4px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.menu hr{border:0;border-top:1px solid var(--line);margin:8px 6px}
+.menu a{display:flex;align-items:center;gap:12px;min-height:48px;padding:8px 12px;border-radius:12px;color:var(--ink);text-decoration:none;font-size:15px;font-weight:500;transition:background .15s,color .15s}
+.menu a .em{transition:background .15s,color .15s}
+.menu a:hover,.menu a:focus-visible{background:color-mix(in srgb,var(--accent) 8%,transparent)}
+.menu a:hover .em,.menu a:focus-visible .em{background:var(--accent);color:var(--accent-ink)}
+html{scroll-behavior:smooth}
+section{scroll-margin-top:64px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+.brand{display:flex;gap:10px;align-items:center}
+.brand .av{width:40px;height:40px}
+.brand b{display:block;font:500 22px/1.1 var(--serif)}
+.brand span{font-size:12px;color:var(--muted)}
+/* hero */
+.hero{position:relative;padding:calc(88px + env(safe-area-inset-top)) 20px 8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;overflow:hidden;border:0}
+.hero>*{position:relative;z-index:1}
+.wm{position:absolute!important;z-index:0!important;top:50%;left:50%;width:min(120vw,1100px);height:min(120vw,1100px);margin:calc(min(120vw,1100px)/-2) 0 0 calc(min(120vw,1100px)/-2);color:var(--accent);opacity:var(--wm);pointer-events:none;animation:spin 140s linear infinite}
+.wm svg{width:100%;height:100%;display:block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.js .hero .it{animation:up .5s both;animation-delay:calc(var(--i)*80ms)}
+@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.logo{position:relative;margin-bottom:22px}
+.logo .av{width:112px;height:112px;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 55%,transparent),0 18px 60px color-mix(in srgb,var(--accent) var(--glow),transparent)}
+.halo{position:absolute;inset:-70%;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--accent) 18%,transparent),transparent 62%);animation:pulse 5s ease-in-out infinite alternate;pointer-events:none}
+@keyframes pulse{from{opacity:.7}to{opacity:1}}
+h1{font:400 clamp(36px,7.2vw,64px)/1.08 var(--serif);letter-spacing:-.02em;max-width:14em;margin:18px auto 0;text-wrap:balance}
+.hero .lead{font-size:17px;max-width:34em;margin:18px auto 0}
+.cta{display:inline-flex;align-items:center;gap:10px;min-height:52px;padding:15px 30px;font-size:16px;font-weight:600;border-radius:14px;background:var(--accent);color:var(--accent-ink);text-decoration:none;box-shadow:0 10px 30px color-mix(in srgb,var(--accent) 28%,transparent);transition:filter .2s,box-shadow .2s,transform .15s;margin-top:30px}
+.cta .ic{width:18px;height:18px;stroke-width:2;transition:transform .2s}
+.cta:hover{filter:brightness(1.08);box-shadow:0 14px 38px color-mix(in srgb,var(--accent) 38%,transparent)}
+.cta:hover .ic{transform:translateX(3px)}
+.cta:active{transform:translateY(1px)}
+.cta:focus-visible{outline-offset:3px}
+.note{font-size:12.5px;color:var(--muted);margin-top:16px}
+.chev{color:var(--muted);margin-top:34px;animation:bob 1.2s ease-in-out infinite alternate}
+.chev .ic{width:22px;height:22px}
+@keyframes bob{from{transform:translateY(-1px)}to{transform:translateY(2px)}}
+/* statistik */
+.stats{padding:0;border:0}
+.sg{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:32px 0 56px}
+.st{border:1px solid var(--line);border-radius:14px;padding:18px}
+.st .em{width:36px;height:36px;border-radius:10px;margin-bottom:12px}.st .em .ic{width:18px;height:18px}
+.st b{display:block;font:400 clamp(32px,5vw,44px)/1.1 var(--serif);color:var(--accent)}
+.st span{font-size:13px;color:var(--muted)}
+/* pratinjau */
+.frame{max-width:760px;margin:32px auto 0;border:1px solid var(--line);border-radius:20px;background:var(--bg);box-shadow:var(--shadow-frame);overflow:hidden;pointer-events:none;user-select:none;text-align:left}
+.ph{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line)}
+.pt{font-size:14px;font-weight:600;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.pr{display:flex;gap:8px;margin-left:auto}
+.mb{display:flex;align-items:center;gap:8px;height:36px;padding:0 10px 0 8px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-size:13px;font-weight:600}
+.mb i{width:22px;height:22px;border-radius:7px;background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent);display:inline-flex;align-items:center;justify-content:center}
+.mb i .ic{width:14px;height:14px}
+.mb .ic.mu{width:14px;height:14px;color:var(--muted)}
+.mo{width:36px;height:36px;border-radius:9px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.msgs{padding:22px 18px;display:flex;flex-direction:column;gap:22px}
+.ub{align-self:flex-end;max-width:82%;min-width:0}
+.ub .bb{background:var(--surface);border:1px solid var(--line);padding:10px 15px;border-radius:16px 16px 4px 16px}
+.tm{font-size:11px;color:var(--muted);opacity:.75;margin-top:4px}
+.ub .tm{text-align:right}
+.er{display:flex;gap:12px;min-width:0}
+.er>div{min-width:0;flex:1}
+.er p{line-height:1.68;margin-bottom:10px}
+.er ul{padding-left:24px;margin-bottom:10px}
+.er li{margin-bottom:6px;line-height:1.65}
+.nm{font-size:13px;font-weight:600;margin-bottom:4px}
+.cb{background:var(--code);color:#e9eee9;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:10px}
+.cbh{display:flex;justify-content:space-between;align-items:center;padding:6px 12px;font-size:12px;color:#8d978f;border-bottom:1px solid #252c27}
+.cbh span+span{border:1px solid #2c342e;border-radius:6px;padding:2px 9px}
+.cb pre{padding:12px;font:13px/1.55 ui-monospace,Consolas,monospace;overflow:hidden;white-space:pre-wrap}
+.k{color:#ff7b72}.n{color:#79c0ff}.s{color:#a5d6ff}.c{color:#8b949e}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.acts span{border:1px solid var(--line);border-radius:8px;font-size:12px;color:var(--muted);padding:6px 12px}
+.inp{padding:6px 18px 16px}
+.pill{display:flex;align-items:center;gap:10px;border-radius:28px;padding:6px;border:1px solid var(--line);background:color-mix(in srgb,var(--surface) 86%,transparent);backdrop-filter:blur(14px);box-shadow:var(--shadow-input)}
+.pill>.ic{width:20px;height:20px;color:var(--muted);margin-left:10px}
+.pill span{flex:1;font-size:16px;color:var(--muted);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.snd{width:44px;height:44px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;flex:none}
+.snd .ic{width:19px;height:19px;stroke-width:2.2}
+/* kartu & grid */
+.grid{display:grid;gap:12px}
+.g3{grid-template-columns:1fr}
+.card{border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:6px;transition:border-color .2s,background .2s,transform .2s;cursor:default;min-width:0}
+.card:hover{border-color:var(--accent);background:var(--surface)}
+.card small{color:var(--accent);font-size:11px;font-weight:700;letter-spacing:.06em}
+.card p{font-size:15px}
+.fc{padding:18px;gap:10px}
+.fc:hover{transform:translateY(-1px)}
+.fc .em{width:36px;height:36px;border-radius:10px}
+.fc .em .ic{width:18px;height:18px}
+.fc h3{font-size:15px;font-weight:600}
+.fc p{font-size:14px;color:var(--muted);line-height:1.6}
+.ex{grid-template-columns:repeat(auto-fill,minmax(min(220px,100%),1fr))}
+/* langkah */
+.steps{list-style:none;counter-reset:s;display:grid;gap:6px 40px;grid-template-columns:1fr}
+.steps li{position:relative;padding-left:38px;margin-bottom:13px;line-height:1.65;counter-increment:s;min-width:0}
+.steps li::before{content:counter(s);position:absolute;left:0;top:1px;width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.co{padding:12px 16px;border-radius:10px;border-left:3px solid var(--accent);background:color-mix(in srgb,var(--accent) 8%,var(--bg));font-size:13.5px;line-height:1.65;margin-top:20px}
+.co strong{display:block;margin-bottom:3px}
+.co.warn{border-color:var(--err);background:color-mix(in srgb,var(--err) 8%,var(--bg))}
+/* baris */
+.two{display:grid;gap:10px;grid-template-columns:1fr}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:8px 12px;background:var(--bg);border:1px solid var(--line);border-radius:8px;font-size:13px;min-width:0}
+.row b{font-weight:600}
+.row span.d{color:var(--muted)}
+.row .r{margin-left:auto;display:flex;gap:5px}
+.pc{padding:12px 14px;background:var(--bg);border:1px solid var(--line);border-radius:10px;transition:border-color .2s,transform .2s}
+.pc:hover{border-color:var(--accent);transform:translateY(-1px)}
+.pc b{font-size:13.5px;font-weight:600;display:block}
+.pc span{font-size:11.5px;color:var(--muted);line-height:1.45;display:block}
+.pg{grid-template-columns:repeat(auto-fill,minmax(min(230px,100%),1fr))}
+.mh{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:14px 0 6px}
+.sp{--c:var(--fast);font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;padding:1px 5px;border-radius:4px;line-height:1.4;color:var(--c);border:1px solid color-mix(in srgb,var(--c) 45%,transparent);background:color-mix(in srgb,var(--c) var(--tm),transparent)}
+.sp.mid{--c:var(--mid)}.sp.slow{--c:var(--slow)}.sp.busy{--c:var(--busy)}
+.vs{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;padding:2px 7px;border-radius:10px;color:#7ab8ff;border:1px solid color-mix(in srgb,#7ab8ff 40%,transparent);background:color-mix(in srgb,#7ab8ff 10%,transparent)}
+.leg{display:flex;flex-wrap:wrap;gap:10px 18px;margin-top:22px;font-size:13px;color:var(--muted)}
+.leg div{display:flex;gap:8px;align-items:center}
+.mg{margin-bottom:6px;break-inside:avoid}
+.mg .mh{margin-top:14px}
+.mlist{display:grid;gap:6px}
+/* keamanan */
+.sc{display:flex;gap:12px;padding:14px;border:1px solid var(--line);border-radius:12px}
+.sc .ic{color:var(--accent);margin-top:3px}
+.sc b{display:block;font-size:15px}
+.sc span{font-size:14px;color:var(--muted)}
+.body ul.lst{padding-left:24px}
+.lst li{margin-bottom:6px;line-height:1.65}
+/* diagram */
+.flow{display:flex;flex-direction:column;align-items:stretch;gap:8px;margin-top:28px;pointer-events:none}
+.fb{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:14px 16px;text-align:center;flex:1}
+.fb.w{border-color:var(--accent)}
+.fb b{display:block;font-size:13px;font-weight:600}
+.fb span{font-size:11.5px;color:var(--muted)}
+.fa{align-self:center;color:var(--accent);transform:rotate(90deg);display:flex}
+.fa .ic{width:28px;height:28px}
+/* pencipta */
+.bio{display:flex;gap:16px;padding:16px;background:var(--bg);border:1px solid var(--line);border-radius:14px;align-items:center;margin-bottom:22px}
+.bio .av{width:56px;height:56px}
+.bio b{font-size:16px;display:block}
+.bio .sb{font-size:12.5px;color:var(--muted)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.body p{line-height:1.68;margin-bottom:10px}
+.lic{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:10px 14px;background:var(--bg);border:1px solid var(--line);border-radius:10px;font-size:13px;margin-bottom:8px}
+.lic .bd{--c:var(--fast);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:3px 10px;border-radius:6px;color:var(--c);border:1px solid color-mix(in srgb,var(--c) 45%,transparent);background:color-mix(in srgb,var(--c) var(--tm),transparent)}
+.lic .bd.mid{--c:var(--mid)}.lic .bd.slow{--c:var(--slow)}
+.lic i{margin-left:auto;font-style:normal;font-size:12px;color:var(--muted)}
+footer{border-top:1px solid var(--line);padding:22px 20px calc(30px + env(safe-area-inset-bottom));text-align:center;font-size:12.5px;color:var(--muted);line-height:1.8}
+footer .tg{font-size:11px;font-weight:700;padding:2px 10px;margin-bottom:6px}
+@media (min-width:760px){
+  .wrap{padding:0 20px}
+  .sg{grid-template-columns:repeat(4,1fr)}
+  .g3{grid-template-columns:repeat(2,1fr)}
+  .steps.c2{grid-template-columns:1fr 1fr}
+  .two{grid-template-columns:1fr 1fr}
+  .mlist{grid-template-columns:1fr 1fr}
+  .flow{flex-direction:row;align-items:center}
+  .fa{transform:none}
+  .fb{padding:16px}
+}
+@media (min-width:1024px){.g3{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:759px){
+  section{padding:64px 0}
+  .wrap{padding:0 18px}
+  .pt{display:none}
+  .logo .av{width:92px;height:92px}
+  .lic i{margin-left:0;width:100%}
+  .bio{align-items:flex-start}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.js .rv{opacity:1;transform:none}.js .hero .it{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 14 0v1"/></symbol>
+<symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></symbol>
+<symbol id="i-plug" viewBox="0 0 24 24"><path d="M9 2v6M15 2v6M6 8h12v4a6 6 0 0 1-12 0V8zM12 18v4"/></symbol>
+<symbol id="i-cpu" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M1 15h3M20 9h3M20 15h3"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></symbol>
+<symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></symbol>
+<symbol id="i-cloud" viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></symbol>
+<symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></symbol>
+<symbol id="i-wallet" viewBox="0 0 24 24"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></symbol>
+<symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></symbol>
+<symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+<symbol id="i-grad" viewBox="0 0 24 24"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></symbol>
+<symbol id="i-pin2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+<symbol id="i-zap" viewBox="0 0 24 24"><path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z"/></symbol>
+<symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/></symbol>
+<symbol id="i-chip" viewBox="0 0 24 24"><path d="M9 3v2M15 3v2M9 19v2M15 19v2M3 9h2M3 15h2M19 9h2M19 15h2M7 7h10v10H7z"/></symbol>
+<symbol id="i-wind" viewBox="0 0 24 24"><path d="M3 8h10a3 3 0 100-3M3 12h15a3 3 0 110 3h-6M3 16h7"/></symbol>
+<symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14M5 19l7-7"/></symbol>
+<symbol id="i-clip" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></symbol>
+<symbol id="i-up" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+<symbol id="i-pencil" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 17v5"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24z"/></symbol>
+<symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></symbol>
+<symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></symbol>
+<symbol id="i-code" viewBox="0 0 24 24"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></symbol>
+</svg>
+
+
+<div class="scrim" id="scrim" hidden></div>
+<header class="top">
+ <div class="wrap">
+  <div class="brand"><span class="av" aria-hidden="true">E</span><b>Elara</b></div>
+  <div class="mw">
+   <button class="hb" id="hb" type="button" aria-label="Buka menu" aria-expanded="false" aria-controls="menu"><svg class="ic i-m" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg><svg class="ic i-x" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+   <nav class="menu" id="menu" aria-label="Akses cepat" hidden>
+    <span class="mlb">Mengenal Elara</span>
+    <a href="#t-fit"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-zap"/></svg></span>Fitur</a><a href="#t-how"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-book"/></svg></span>Cara pakai</a><a href="#t-cost"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-wallet"/></svg></span>Biaya dan kuota</a><a href="#t-sec"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-shield"/></svg></span>Keamanan</a>
+    <hr>
+    <span class="mlb">Di balik layar</span>
+    <a href="#t-prov"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-plug"/></svg></span>Provider AI</a><a href="#t-mdl"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-cpu"/></svg></span>Model</a><a href="#t-tech"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-layers"/></svg></span>Teknologi</a><a href="#t-me"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-user"/></svg></span>Pencipta</a>
+   </nav>
+  </div>
+ </div>
+</header>
+
+<main>
+<section class="hero" aria-labelledby="h1">
+ <div class="wm" aria-hidden="true"><svg viewBox="0 0 64 64" aria-hidden="true"><g id="wmg" stroke="currentColor" stroke-width="4.4" stroke-linecap="round" fill="none"></g></svg></div>
+ <h1 id="h1" class="it" style="--i:2">Halo! Aku <em>Elara</em>, asisten AI pribadi kamu</h1>
+ <p class="lead it" style="--i:3">Tanya apa saja, berdiskusi, atau cari solusi bareng. Cepat, ringan, dan cukup dibuka di browser</p>
+ <div class="it" style="--i:4"><a id="cta" class="cta" href="chat.html">Mulai Elara</a></div>
+</section>
+
+<section class="stats" aria-label="Ringkasan Elara">
+ <div class="wrap"><div class="sg">
+  <div class="st rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-plug"/></svg></span><b data-k="prov">10</b><span>Penyedia AI</span></div>
+  <div class="st rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-cpu"/></svg></span><b data-k="mdl">35</b><span>Model siap pilih</span></div>
+  <div class="st rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-clip"/></svg></span><b data-k="vis">4</b><span>Model bisa membaca gambar</span></div>
+  <div class="st rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-shield"/></svg></span><b data-k="zero">0</b><span>Iklan</span></div>
+ </div></div>
+</section>
+
+<section class="alt" aria-labelledby="t-prev"><div class="wrap">
+ <div class="eb rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-sparkle"/></svg></span><span class="lb">Pratinjau</span></div>
+ <h2 id="t-prev" class="rv">Ngobrol yang terasa <em>rapi</em>.</h2>
+ <p class="lead rv">Jawaban mengalir sambil diketik, kode berwarna, dan tombol salin selalu ada. Begini tampilan aslinya.</p>
+ <div class="frame rv" aria-hidden="true" inert>
+  <div class="ph"><div class="pt">Jelaskan perbedaan antara let, const…</div>
+   <div class="pr"><span class="mb"><i><svg class="ic" aria-hidden="true"><use href="#i-wind"/></svg></i>GPT-OSS 20B<svg class="ic mu"><use href="#i-down"/></svg></span><span class="mo"><svg class="ic"><use href="#i-moon"/></svg></span></div></div>
+  <div class="msgs">
+   <div class="ub"><div class="bb">Jelaskan perbedaan antara let, const, dan var di JavaScript</div><div class="tm">09.41</div></div>
+   <div class="er"><span class="av">E</span><div>
+    <div class="nm">Elara</div>
+    <p>Perbedaannya ada di <strong>lingkup</strong> dan cara diubah:</p>
+    <ul><li><code>var</code> berlingkup fungsi dan bisa dideklarasikan ulang</li><li><code>let</code> berlingkup blok dan nilainya boleh diganti</li><li><code>const</code> berlingkup blok dan tidak bisa diberi nilai baru</li></ul>
+    <div class="cb"><div class="cbh"><span>javascript</span><span>Salin</span></div><pre><span class="k">let</span> skor = <span class="n">1</span>;
+skor = <span class="n">2</span>;          <span class="c">// boleh</span>
+
+<span class="k">const</span> nama = <span class="s">"Elara"</span>;
+nama = <span class="s">"Lain"</span>;     <span class="c">// TypeError</span></pre></div>
+    <div class="acts"><span>Salin jawaban</span><span>Ulangi</span></div>
+    <div class="tm">09.42</div>
+   </div></div>
+  </div>
+  <div class="inp"><div class="pill"><svg class="ic"><use href="#i-clip"/></svg><span>Tanya Elara apa saja…</span><div class="snd"><svg class="ic"><use href="#i-up"/></svg></div></div></div>
+ </div>
+</div></section>
+
+<section aria-labelledby="t-fit"><div class="wrap">
+ <div class="eb rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-zap"/></svg></span><span class="lb">Fitur</span></div>
+ <h2 id="t-fit" class="rv">Semua yang kamu butuhkan, <em>tanpa ribet</em>.</h2>
+ <p class="lead rv">Dirancang supaya cepat dipakai dan nyaman dibaca.</p>
+ <div class="grid g3 body">
+  <div class="card fc rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-chip"/></svg></span><h3>Banyak model, satu tempat</h3><p><span data-k="prov">10</span> penyedia AI dan puluhan model dalam satu menu. Kalau satu provider sedang sibuk atau down, ganti saja ke yang lain.</p></div>
+  <div class="card fc rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-zap"/></svg></span><h3>Jawaban mengalir</h3><p>Jawaban dibaca bertahap lewat SSE, jadi muncul sambil diketik tanpa menunggu sampai selesai.</p></div>
+  <div class="card fc rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-clip"/></svg></span><h3>Bisa membaca gambar</h3><p>Lampirkan gambar lewat ikon klip. Model dengan kemampuan vision yang bisa membacanya.</p></div>
+  <div class="card fc rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-code"/></svg></span><h3>Kode dan rumus rapi</h3><p>Rumus tampil lewat KaTeX, kode berwarna lewat highlight.js dengan tombol salin, plus tabel, kutipan, dan daftar Markdown.</p></div>
+  <div class="card fc rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg></span><h3>Riwayat tersimpan lokal</h3><p>Cari, sematkan, ganti nama, atau hapus obrolan kapan saja. Di HP, geser ke kiri untuk menghapus.</p></div>
+  <div class="card fc rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-pencil"/></svg></span><h3>Edit dan ulangi</h3><p>Salah ketik? Edit pesanmu lalu kirim ulang. Kurang pas? Ulangi jawaban terakhir.</p></div>
+  <div class="card fc rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-moon"/></svg></span><h3>Tema terang dan gelap</h3><p>Ganti kapan saja. Pilihanmu tersimpan otomatis.</p></div>
+  <div class="card fc rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-leaf"/></svg></span><h3>Ringan dan cepat</h3><p>Satu file HTML tanpa framework. Tidak perlu bundler atau npm install.</p></div>
+  <div class="card fc rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-shield"/></svg></span><h3>Privasi terjaga</h3><p>Tanpa analytics, cookie pihak ketiga, atau telemetri. Datamu tersimpan lokal.</p></div>
+ </div>
+</div></section>
+
+<section class="alt" aria-labelledby="t-ex"><div class="wrap">
+ <div class="eb rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-pencil"/></svg></span><span class="lb">Contoh pertanyaan</span></div>
+ <h2 id="t-ex" class="rv">Coba tanyakan <em>apa saja</em>.</h2>
+ <p class="lead rv">Beberapa ide untuk memulai.</p>
+ <div class="grid ex body" id="ex"></div>
+</div></section>
+
+<section aria-labelledby="t-how"><div class="wrap">
+ <div class="eb rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-book"/></svg></span><span class="lb">Cara pakai</span></div>
+ <h2 id="t-how" class="rv">Delapan langkah, <em>langsung bisa</em>.</h2>
+ <p class="lead rv">Begini cara memakai Elara setelah kamu masuk.</p>
+ <ol class="steps c2 body rv">
+  <li><strong>Pilih model.</strong> Klik tombol model di kanan atas, lalu pilih provider dan model.</li>
+  <li><strong>Ketik pertanyaan</strong> di kolom bawah. <code>Enter</code> untuk kirim, <code>Shift+Enter</code> untuk baris baru.</li>
+  <li><strong>Lampirkan gambar</strong> (opsional) lewat ikon klip. Hanya model dengan kemampuan vision yang bisa membacanya.</li>
+  <li><strong>Kelola obrolan.</strong> Arahkan kursor ke obrolan di sidebar untuk menyematkan, mengganti nama, atau menghapus. Di HP, geser obrolan ke kiri untuk menghapus.</li>
+  <li><strong>Edit pesan.</strong> Klik "Edit" di pesanmu untuk memperbaiki dan mengirim ulang.</li>
+  <li><strong>Ulangi jawaban.</strong> Pakai tombol "Ulangi" di bawah jawaban terakhir.</li>
+  <li><strong>Ganti tema.</strong> Klik ikon bulan di header. Pilihanmu disimpan otomatis.</li>
+  <li><strong>Shortcut.</strong> <code>Ctrl/Cmd + K</code> untuk obrolan baru, <code>Esc</code> untuk menutup menu atau jendela.</li>
+ </ol>
+</div></section>
+
+<section class="alt" aria-labelledby="t-cost"><div class="wrap">
+ <div class="eb rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-wallet"/></svg></span><span class="lb">Biaya dan kuota</span></div>
+ <h2 id="t-cost" class="rv">Gratis untuk kamu. <em>Tanpa iklan.</em></h2>
+ <p class="lead rv">Elara gratis untuk pengguna. Tidak ada langganan dan tidak ada iklan. Biayanya ditanggung lewat free tier masing-masing provider:</p>
+ <div class="two body">
+  <div class="row rv"><b>Groq:</b><span class="d">gratis dengan batas harian.</span></div>
+  <div class="row rv"><b>OpenRouter:</b><span class="d">model bertanda :free gratis, kadang harus antre.</span></div>
+  <div class="row rv"><b>Google Gemini:</b><span class="d">kuota gratis harian dari AI Studio.</span></div>
+  <div class="row rv"><b>Cloudflare Workers AI:</b><span class="d">kuota gratis bulanan.</span></div>
+  <div class="row rv"><b>Zro MoonMath:</b><span class="d">paket gratis, kuota reset tiap hari.</span></div>
+  <div class="row rv"><b>InferX:</b><span class="d">promo gratis untuk periode terbatas.</span></div>
+  <div class="row rv"><b>Pollinations:</b><span class="d">akses gratis lewat key sekunder.</span></div>
+  <div class="row rv"><b>NVIDIA NIM dan Mistral:</b><span class="d">free tier untuk percobaan.</span></div>
+ </div>
+</div></section>
+
+<section aria-labelledby="t-sec"><div class="wrap">
+ <div class="eb rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-shield"/></svg></span><span class="lb">Keamanan dan privasi</span></div>
+ <h2 id="t-sec" class="rv">Datamu tetap <em>milikmu</em>.</h2>
+ <div class="two body">
+  <div class="sc rv"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><div><b>API key tidak ada di browser.</b><span>Key disimpan sebagai Secret di Cloudflare Worker, bukan di HTML.</span></div></div>
+  <div class="sc rv"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><div><b>Tanpa pelacakan.</b><span>Tidak ada analytics, cookie pihak ketiga, atau telemetri.</span></div></div>
+  <div class="sc rv"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><div><b>Data milikmu.</b><span>Riwayat obrolan tersimpan lokal dan bisa kamu hapus kapan saja.</span></div></div>
+  <div class="sc rv"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><div><b>Teks di-escape.</b><span>Semua jawaban model diamankan dulu sebelum ditampilkan, supaya tidak ada skrip yang bisa jalan.</span></div></div>
+ </div>
+ <div class="co warn rv"><strong>Catatan</strong>Elara hanya antarmuka. Jawaban datang dari model AI pihak ketiga dan bisa saja salah. Cek ulang informasi yang penting.</div>
+</div></section>
+
+<section class="alt" aria-labelledby="t-prov"><div class="wrap">
+ <div class="eb rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-plug"/></svg></span><span class="lb">Provider AI</span></div>
+ <h2 id="t-prov" class="rv"><span data-k="prov">10</span> penyedia AI, <em>satu tempat</em>.</h2>
+ <p class="lead rv">Elara bisa memakai <span data-k="prov">10</span> penyedia AI. Tinggal pilih dari menu model. Kalau satu provider sedang sibuk atau down, ganti saja ke yang lain.</p>
+ <div class="grid pg body" id="prov"></div>
+</div></section>
+
+<section aria-labelledby="t-mdl"><div class="wrap">
+ <div class="eb rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-cpu"/></svg></span><span class="lb">Model yang tersedia</span></div>
+ <h2 id="t-mdl" class="rv">Pilih model <em>sesuai kebutuhan</em>.</h2>
+ <p class="lead rv">Tag Fast, Mid, Slow, dan Busy menunjukkan perkiraan kecepatan dan seberapa ramai model tersebut.</p>
+ <div class="leg rv" aria-hidden="true">
+  <div><span class="sp">Fast</span>cepat</div><div><span class="sp mid">Mid</span>sedang</div><div><span class="sp slow">Slow</span>lebih lambat</div><div><span class="sp busy">Busy</span>sering ramai atau antre</div><div><span class="vs">Vision</span>bisa membaca gambar</div>
+ </div>
+ <div class="body mlist" id="mdl"></div>
+</div></section>
+
+<section class="alt" aria-labelledby="t-tech"><div class="wrap">
+ <div class="eb rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-layers"/></svg></span><span class="lb">Teknologi</span></div>
+ <h2 id="t-tech" class="rv">Ringan di luar, <em>rapi di dalam</em>.</h2>
+ <p class="lead rv">Elara berupa satu file HTML. Tampilan, logika, dan pengelolaan data ada di file yang sama. Tidak perlu bundler atau <code>npm install</code>, cukup buka di browser.</p>
+ <ul class="lst body rv">
+  <li><strong>Frontend:</strong> HTML, CSS, dan JavaScript biasa tanpa framework.</li>
+  <li><strong>Proxy:</strong> Cloudflare Workers, sebagai perantara antara browser dan penyedia AI.</li>
+  <li><strong>Streaming:</strong> jawaban dari tiap provider dibaca bertahap lewat SSE, jadi muncul sambil diketik.</li>
+  <li><strong>Penyimpanan:</strong> riwayat chat, pilihan model, dan tema disimpan di <code>localStorage</code> browser.</li>
+  <li><strong>Tampilan jawaban:</strong> parser Markdown buatan sendiri, KaTeX untuk rumus, dan highlight.js untuk kode.</li>
+ </ul>
+ <div class="flow rv" aria-hidden="true">
+  <div class="fb"><b>Browser kamu</b></div>
+  <div class="fa"><svg class="ic"><use href="#i-arrow"/></svg></div>
+  <div class="fb w"><b>Cloudflare Worker</b><span>menambahkan API key</span></div>
+  <div class="fa"><svg class="ic"><use href="#i-arrow"/></svg></div>
+  <div class="fb"><b>Penyedia AI</b></div>
+ </div>
+ <div class="co rv"><strong>Kenapa pakai Cloudflare Worker?</strong>Supaya API key tidak ada di browser. Browser hanya bicara ke Worker, lalu Worker menambahkan key dan meneruskan permintaan ke provider. Cara ini juga menghindari masalah CORS.</div>
+</div></section>
+
+<section aria-labelledby="t-me"><div class="wrap">
+ <div class="eb rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-user"/></svg></span><span class="lb">Pencipta</span></div>
+ <h2 id="t-me" class="rv">Dikerjakan sendiri dalam <em>2 sampai 3 hari</em>.</h2>
+ <div class="body">
+  <div class="bio rv"><span class="av" aria-hidden="true">E</span><div><b>Gilang Armanda Putra</b><div class="sb">Pencipta dan developer</div>
+   <div class="tags"><span class="tg"><svg class="ic"><use href="#i-cal"/></svg>19 tahun</span><span class="tg"><svg class="ic"><use href="#i-grad"/></svg>Lulusan SMK</span><span class="tg"><svg class="ic"><use href="#i-pin2"/></svg>Indonesia</span><span class="tg"><svg class="ic"><use href="#i-zap"/></svg>2 sampai 3 hari</span></div></div></div>
+  <p class="rv">Elara dibuat oleh <strong>Gilang Armanda Putra</strong>, 19 tahun, lulusan SMK. Seluruh sistemnya dikerjakan sendiri dalam 2 sampai 3 hari, mulai dari tampilan, arsitektur, pengaturan banyak model AI, sampai keamanannya.</p>
+  <p class="rv">Tujuannya sederhana: asisten AI yang cepat, bisa diandalkan, dan ringan. Tanpa iklan, tanpa pelacakan, dan gratis untuk pengguna.</p>
+ </div>
+</div></section>
+
+<section class="alt" aria-labelledby="t-dev"><div class="wrap">
+ <div class="eb rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-cloud"/></svg></span><span class="lb">Untuk developer</span></div>
+ <h2 id="t-dev" class="rv">Mau hosting <em>sendiri</em>?</h2>
+ <p class="lead rv">Mau fork Elara dan hosting sendiri? Ini langkah singkat untuk menyiapkan proxy Cloudflare Worker.</p>
+ <ol class="steps body rv">
+  <li>Buat akun gratis di dash.cloudflare.com.</li>
+  <li>Buka <strong>Workers &amp; Pages</strong>, pilih <strong>Create</strong> lalu <strong>Worker</strong>, dan beri nama misalnya <code>elara-proxy</code>.</li>
+  <li>Edit Worker dan tempel skrip proxy. Buat router sederhana yang meneruskan <code>/groq/*</code>, <code>/gemini/*</code>, <code>/openrouter/*</code>, dan seterusnya ke endpoint provider masing-masing.</li>
+  <li>Buka <strong>Settings</strong> lalu <strong>Variables and Secrets</strong>, dan tambahkan secret: <code>GEMINI_KEY</code>, <code>GROQ_KEY</code>, <code>OPENROUTER_KEY</code>, <code>MISTRAL_KEY</code>, <code>INFERX_KEY</code>, <code>ZRO_KEY</code>, <code>NVIDIA_KEY</code>, <code>POLLINATIONS_KEY</code>. Jangan tulis nilainya di kode.</li>
+  <li>Deploy Worker, lalu salin URL-nya (contoh <code>https://elara-proxy.username.workers.dev</code>).</li>
+  <li>Di file HTML Elara, cari baris <code>const WORKER_BASE = "..."</code> dan ganti dengan URL Worker-mu.</li>
+  <li>Buka Elara di browser. Semua panggilan AI sekarang lewat proxy-mu sendiri.</li>
+ </ol>
+ <div class="co rv"><strong>Saran</strong>Aktifkan rate limiting di Worker (misalnya 30 permintaan per menit per IP) supaya tidak disalahgunakan kalau URL-nya dibagikan.</div>
+</div></section>
+
+<section aria-labelledby="t-lic"><div class="wrap">
+ <div class="eb rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-file"/></svg></span><span class="lb">Lisensi</span></div>
+ <h2 id="t-lic" class="rv">Lisensi dan <em>atribusi</em>.</h2>
+ <p class="lead rv">Elara memakai beberapa komponen open-source. Berikut daftar dan lisensinya:</p>
+ <div class="body">
+  <div class="lic rv"><span class="bd">MIT</span><b>Elara (kode aplikasi)</b><i>© Gilang Armanda Putra</i></div>
+  <div class="lic rv"><span class="bd">MIT</span><b>KaTeX v0.16.9</b><i>katex.org, untuk rumus</i></div>
+  <div class="lic rv"><span class="bd mid">BSD-3</span><b>highlight.js v11.9.0</b><i>highlightjs.org, untuk kode</i></div>
+  <div class="lic rv"><span class="bd">MIT</span><b>Cloudflare Workers Runtime</b><i>workers.cloudflare.com</i></div>
+  <div class="lic rv"><span class="bd slow">ToS</span><b>Model AI (Gemini, Groq, OpenRouter, dll.)</b><i>Mengikuti syarat dari masing-masing penyedia</i></div>
+  <div class="lic rv"><span class="bd">MIT</span><b>Ikon SVG</b><i>Dibuat manual, bebas dipakai ulang</i></div>
+ </div>
+</div></section>
+
+<section class="alt" aria-labelledby="t-thx"><div class="wrap">
+ <div class="eb rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-heart"/></svg></span><span class="lb">Terima kasih</span></div>
+ <h2 id="t-thx" class="rv">Terima <em>kasih</em>.</h2>
+ <p class="lead rv">Terima kasih untuk:</p>
+ <ul class="lst body rv">
+  <li><strong>Cloudflare</strong> yang menyediakan proxy gratis.</li>
+  <li><strong>Google, Groq, OpenRouter, NVIDIA, Mistral, InferX, Zro, Pollinations, dan Coarena</strong> yang membuka akses ke model AI.</li>
+  <li><strong>Komunitas open-source</strong> di balik KaTeX, highlight.js, dan banyak proyek lain.</li>
+  <li><strong>Kamu</strong> yang sudah memakai dan memberi masukan.</li>
+ </ul>
+</div></section>
+</main>
+
+<footer>
+ Dikembangkan secara independen di Indonesia<br>
+ © <span id="yr">2026</span> Gilang Armanda Putra · MIT License
+</footer>
+
+<script>
+/* Data: satu-satunya sumber angka dan daftar */
+const MODELS = [
+["Groq","GPT-OSS 20B",0,"fast"],
+["Groq","GPT-OSS 120B",0,"fast"],
+["Groq","Qwen 3.8 27B",1,"fast"],
+["NVIDIA","Nemotron 3 Ultra",0,"slow"],
+["NVIDIA","Nemotron 3.5 Lightning",0,"fast"],
+["NVIDIA","Laguna XS 2.1",0,"mid"],
+["NVIDIA","Nemotron 3 Nano Omni",0,"mid"],
+["NVIDIA","Nemotron 3.5 Super VL",0,"mid"],
+["NVIDIA","Nemotron 3.5 Bolt E4B",0,"fast"],
+["OpenRouter","Nemotron 3 Ultra",0,"slow"],
+["OpenRouter","ERNIE 5.5 Flash",0,"busy"],
+["OpenRouter","Nemotron 3.5 Super VL",1,"slow"],
+["OpenRouter","Flint 1.0",0,"busy"],
+["OpenRouter","LFM 3 1.7B",0,"busy"],
+["OpenRouter","Auto (Free Router)",0,"busy"],
+["Zro MoonMath","DeepSeek V4.1 Flash",0,"slow"],
+["Gemini","3.5 Flash-Lite",1,"busy"],
+["Cloudflare","GPT-OSS 120B",0,"mid"],
+["Cloudflare","Llama 3.3 70B",0,"fast"],
+["Cloudflare","Llama 4 Scout",1,"fast"],
+["Coarena","DeepSeek V4.1 Flash",0,"fast"],
+["Coarena","GPT-6 Luna",0,"fast"],
+["Coarena","Gemini 3.8 Flash",0,"fast"],
+["Pollinations","GPT-5.4 Nano",0,"mid"],
+["Pollinations","GPT-OSS 20B",0,"mid"],
+["Pollinations","DeepSeek V4 Flash",0,"mid"],
+["InferX","DeepSeek V4 Flash",0,"busy"],
+["InferX","DeepSeek V4.1 Flash",0,"busy"],
+["InferX","Agents A1",0,"busy"],
+["InferX","Gemma 4 31B",0,"busy"],
+["InferX","Devstral 2 123B",0,"busy"],
+["InferX","GLM 5.3 Flash",0,"busy"],
+["InferX","GLM 5.3",0,"busy"],
+["Mistral","Codestral",0,"mid"],
+["Mistral","Mistral Nemo",0,"mid"]
+];
+const PROVIDERS = [
+["Google Gemini","Model Gemini terbaru, ada kuota gratis harian."],
+["Groq","Inferensi cepat, banyak model open-weight gratis."],
+["OpenRouter","Satu pintu untuk banyak model, ada varian :free."],
+["NVIDIA NIM","Model Nemotron dengan konteks panjang."],
+["Mistral AI","Codestral dan Mistral Nemo, bagus untuk coding."],
+["InferX","Model DeepSeek, GLM, Gemma, dan Devstral, ada promo gratis."],
+["Zro MoonMath","DeepSeek V4.1 Flash dengan reasoning, ada paket gratis harian."],
+["Cloudflare Workers AI","Model open-weight gratis, tanpa API key terpisah."],
+["Coarena","Gateway untuk DeepSeek, GPT, dan Gemini versi cepat."],
+["Pollinations","GPT-OSS, GPT-5.4 Nano, dan DeepSeek Flash."]
+];
+const EXAMPLES = [
+["KODING","Buatkan fungsi JavaScript untuk memvalidasi email dengan regex"],
+["KODING","Jelaskan perbedaan antara let, const, dan var di JavaScript"],
+["KODING","Bagaimana cara membuat REST API sederhana dengan Node.js?"],
+["KODING","Tolong perbaiki kode HTML/CSS saya yang berantakan ini"],
+["KODING","Apa itu Docker dan kenapa developer sering memakainya?"],
+["KODING","Buatkan script Python untuk merapikan nama file di folder"],
+["KODING","Jelaskan konsep OOP (Object Oriented Programming) dengan analogi sederhana"],
+["LINGKUNGAN","Cara membuat blog lingkungan"]
+];
+const CHAT_URL = "chat.html"; // ganti sesuai lokasi aplikasi chat
+(function(){
+  var reduce = matchMedia("(prefers-reduced-motion:reduce)").matches;
+  var $ = function(s){return document.querySelector(s)};
+  var mk = function(tag, cls, txt){var e=document.createElement(tag); if(cls) e.className=cls; if(txt!=null) e.textContent=txt; return e};
+
+  // watermark: isi SPOKES yang sama dengan logo
+  $("#wmg").innerHTML = SPOKES;
+
+  // angka dari data
+  var provs = [], groups = {}, vis = 0;
+  MODELS.forEach(function(m){ if(!groups[m[0]]){groups[m[0]]=[];provs.push(m[0]);} groups[m[0]].push(m); if(m[2]) vis++; });
+  var vals = {prov:provs.length, mdl:MODELS.length, vis:vis, zero:0};
+  document.querySelectorAll("[data-k]").forEach(function(e){ e.textContent = vals[e.dataset.k]; });
+
+  // contoh pertanyaan, provider, model (DOM API)
+  EXAMPLES.forEach(function(x){ var c=mk("div","card rv"); c.appendChild(mk("small",null,x[0])); c.appendChild(mk("p",null,x[1])); $("#ex").appendChild(c); });
+  PROVIDERS.forEach(function(p){ var c=mk("div","pc rv"); c.appendChild(mk("b",null,p[0])); c.appendChild(mk("span",null,p[1])); $("#prov").appendChild(c); });
+  var LBL = {fast:"Fast",mid:"Mid",slow:"Slow",busy:"Busy"};
+  provs.forEach(function(p){
+    var g = mk("div","mg rv"); g.appendChild(mk("div","mh",p));
+    groups[p].forEach(function(m){
+      var r = mk("div","row"); r.appendChild(mk("b",null,m[1]));
+      var t = mk("span","r");
+      if(m[2]) t.appendChild(mk("span","vs","Vision"));
+      t.appendChild(mk("span","sp "+(m[3]==="fast"?"":m[3]),LBL[m[3]]));
+      r.appendChild(t); g.appendChild(r);
+    });
+    $("#mdl").appendChild(g);
+  });
+  $("#yr").textContent = new Date().getFullYear();
+
+  // hitung naik
+  function count(){
+    document.querySelectorAll(".st b").forEach(function(b){
+      var to = vals[b.dataset.k];
+      if(reduce || !to){ b.textContent = to; return; }
+      var t0 = performance.now();
+      (function f(t){ var p = Math.min((t-t0)/900,1), e = 1-Math.pow(1-p,3); b.textContent = Math.round(to*e); if(p<1) requestAnimationFrame(f); })(t0);
+    });
+  }
+
+  // reveal
+  var items = document.querySelectorAll(".rv");
+  if(!("IntersectionObserver" in window) || reduce){
+    items.forEach(function(e){e.classList.add("in")}); count();
+  } else {
+    var counted = false;
+    var io = new IntersectionObserver(function(es){
+      es.forEach(function(en){
+        if(!en.isIntersecting) return;
+        var e = en.target, i = Array.prototype.indexOf.call(e.parentNode.children, e);
+        e.style.transitionDelay = Math.min(i*60,300)+"ms";
+        e.classList.add("in"); io.unobserve(e);
+        if(!counted && e.classList.contains("st")){ counted = true; count(); }
+      });
+    },{threshold:.12});
+    items.forEach(function(e){io.observe(e)});
+  }
+
+  // menu hamburger
+  var hb = $("#hb"), mn = $("#menu"), sc = $("#scrim");
+  function setMenu(o){ mn.hidden = !o; sc.hidden = !o; hb.setAttribute("aria-expanded", o?"true":"false"); hb.setAttribute("aria-label", o?"Tutup menu":"Buka menu"); }
+  hb.addEventListener("click", function(){ setMenu(mn.hidden); });
+  mn.addEventListener("click", function(e){ if(e.target.closest("a")) setMenu(false); });
+  sc.addEventListener("click", function(){ setMenu(false); });
+  document.addEventListener("keydown", function(e){ if(e.key==="Escape" && !mn.hidden){ setMenu(false); hb.focus(); } });
+
+  // tombol: fade-out lalu pindah, prefetch sekali
+  var cta = $("#cta"); cta.setAttribute("href", CHAT_URL);
+  var pf = false;
+  function prefetch(){ if(pf) return; pf = true; var l = document.createElement("link"); l.rel="prefetch"; l.href=CHAT_URL; document.head.appendChild(l); }
+  ["pointerenter","focus","touchstart"].forEach(function(ev){ cta.addEventListener(ev, prefetch, {passive:true}); });
+  cta.addEventListener("click", function(e){
+    if(e.ctrlKey||e.metaKey||e.shiftKey||e.button===1) return;
+    if(reduce) return;
+    e.preventDefault();
+    document.body.classList.add("leaving");
+    setTimeout(function(){ location.href = CHAT_URL; }, 220);
+  });
+  addEventListener("pageshow", function(){ document.body.classList.remove("leaving"); });
+})();
+</script>
+</body>
+</html>
