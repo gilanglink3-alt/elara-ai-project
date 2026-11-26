@@ -38,14 +38,14 @@ const applyAvatar = t => document.documentElement.style.setProperty("--avatar", 
   --bg:#0f1311; --side:#0b0e0c; --surface:#171c19; --ink:#e9eee9; --muted:#8d978f; --line:#252c27;
   --accent:#c6f26b; --accent-ink:#12190a; --err:#ff8a80; --code:#0a0d0b;
   --serif:"Iowan Old Style","Palatino Linotype",Georgia,serif;
-  --fast:#a3e635; --mid:#7ab8ff; --slow:#e8bc6c; --busy:#ff9a90; --tm:12%; --wm:.05; --glow:30%;
+  --fast:#a3e635; --mid:#7ab8ff; --slow:#e8bc6c; --busy:#ff9a90; --tm:12%;
   --shadow-frame:0 24px 60px rgba(0,0,0,.5); --shadow-input:0 10px 30px rgba(0,0,0,.28);
   color-scheme:dark;
 }
 :root[data-theme="light"]{
   --bg:#f5f3ec; --side:#ece9df; --surface:#ffffff; --ink:#1b211d; --muted:#6a736c; --line:#dcd8cc;
   --accent:#2f6b0f; --accent-ink:#ffffff; --err:#b42318; --code:#1b211d; color-scheme:light;
-  --fast:#3f6212; --mid:#1e40af; --slow:#8a5a00; --busy:#b42318; --tm:10%; --wm:.07; --glow:22%;
+  --fast:#3f6212; --mid:#1e40af; --slow:#8a5a00; --busy:#b42318; --tm:10%;
   --shadow-frame:0 16px 36px rgba(40,50,30,.18); --shadow-input:0 10px 28px rgba(40,50,30,.12);
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -77,14 +77,14 @@ code{background:var(--code);color:#e9eee9;padding:2px 7px;border-radius:5px;font
 /* bilah atas */
 .top{position:fixed;top:0;left:0;right:0;z-index:5;padding:calc(10px + env(safe-area-inset-top)) 0 10px;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
 .top .wrap{display:flex;justify-content:space-between;align-items:center;position:relative}
-.hb{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s}
-.hb:hover{border-color:var(--accent)}
+.hb{width:44px;height:44px;border-radius:12px;border:0;background:none;color:var(--ink);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:color .2s}
+.hb:hover{color:var(--accent)}
 .hb .ic{width:20px;height:20px}
 .mw{position:relative}
 .hb .i-x{display:none}
 .hb[aria-expanded="true"] .i-m{display:none}
 .hb[aria-expanded="true"] .i-x{display:block}
-.hb[aria-expanded="true"]{border-color:var(--accent);color:var(--accent)}
+.hb[aria-expanded="true"]{color:var(--accent)}
 .scrim{position:fixed;inset:0;z-index:4;background:color-mix(in srgb,var(--bg) 55%,transparent);backdrop-filter:blur(4px);animation:fade .2s both}
 .scrim[hidden]{display:none}
 @keyframes fade{from{opacity:0}to{opacity:1}}
@@ -100,22 +100,15 @@ code{background:var(--code);color:#e9eee9;padding:2px 7px;border-radius:5px;font
 html{scroll-behavior:smooth}
 section{scroll-margin-top:64px}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
-.brand{display:flex;gap:10px;align-items:center}
-.brand .av{width:40px;height:40px}
+.brand{display:flex;gap:12px;align-items:center}
+.brand .av{width:42px;height:42px}
 .brand b{display:block;font:500 22px/1.1 var(--serif)}
 .brand span{font-size:12px;color:var(--muted)}
 /* hero */
 .hero{position:relative;padding:calc(88px + env(safe-area-inset-top)) 20px 8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;overflow:hidden;border:0}
 .hero>*{position:relative;z-index:1}
-.wm{position:absolute!important;z-index:0!important;top:50%;left:50%;width:min(120vw,1100px);height:min(120vw,1100px);margin:calc(min(120vw,1100px)/-2) 0 0 calc(min(120vw,1100px)/-2);color:var(--accent);opacity:var(--wm);pointer-events:none;animation:spin 140s linear infinite}
-.wm svg{width:100%;height:100%;display:block}
-@keyframes spin{to{transform:rotate(360deg)}}
 .js .hero .it{animation:up .5s both;animation-delay:calc(var(--i)*80ms)}
 @keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-.logo{position:relative;margin-bottom:22px}
-.logo .av{width:112px;height:112px;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 55%,transparent),0 18px 60px color-mix(in srgb,var(--accent) var(--glow),transparent)}
-.halo{position:absolute;inset:-70%;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--accent) 18%,transparent),transparent 62%);animation:pulse 5s ease-in-out infinite alternate;pointer-events:none}
-@keyframes pulse{from{opacity:.7}to{opacity:1}}
 h1{font:400 clamp(36px,7.2vw,64px)/1.08 var(--serif);letter-spacing:-.02em;max-width:14em;margin:18px auto 0;text-wrap:balance}
 .hero .lead{font-size:17px;max-width:34em;margin:18px auto 0}
 .cta{display:inline-flex;align-items:center;gap:10px;min-height:52px;padding:15px 30px;font-size:16px;font-weight:600;border-radius:14px;background:var(--accent);color:var(--accent-ink);text-decoration:none;box-shadow:0 10px 30px color-mix(in srgb,var(--accent) 28%,transparent);transition:filter .2s,box-shadow .2s,transform .15s;margin-top:30px}
@@ -254,7 +247,6 @@ footer .tg{font-size:11px;font-weight:700;padding:2px 10px;margin-bottom:6px}
   section{padding:64px 0}
   .wrap{padding:0 18px}
   .pt{display:none}
-  .logo .av{width:92px;height:92px}
   .lic i{margin-left:0;width:100%}
   .bio{align-items:flex-start}
 }
@@ -312,9 +304,8 @@ footer .tg{font-size:11px;font-weight:700;padding:2px 10px;margin-bottom:6px}
 
 <main>
 <section class="hero" aria-labelledby="h1">
- <div class="wm" aria-hidden="true"><svg viewBox="0 0 64 64" aria-hidden="true"><g id="wmg" stroke="currentColor" stroke-width="4.4" stroke-linecap="round" fill="none"></g></svg></div>
  <h1 id="h1" class="it" style="--i:2">Halo! Aku <em>Elara</em>, asisten AI pribadi kamu</h1>
- <p class="lead it" style="--i:3">Tanya apa saja, berdiskusi, atau cari solusi bareng. Cepat, ringan, dan cukup dibuka di browser</p>
+ <p class="lead it" style="--i:3">Tanyakan apa saja dari pertanyaan kecil yang mengusik rasa penasaran, hingga persoalan yang menuntut pikiran jernih. Elara menjawab dengan cepat, ringan, dan tenang</p>
  <div class="it" style="--i:4"><a id="cta" class="cta" href="chat.html">Mulai Elara</a></div>
 </section>
 
@@ -329,8 +320,8 @@ footer .tg{font-size:11px;font-weight:700;padding:2px 10px;margin-bottom:6px}
 
 <section class="alt" aria-labelledby="t-prev"><div class="wrap">
  <div class="eb rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-sparkle"/></svg></span><span class="lb">Pratinjau</span></div>
- <h2 id="t-prev" class="rv">Ngobrol yang terasa <em>rapi</em>.</h2>
- <p class="lead rv">Jawaban mengalir sambil diketik, kode berwarna, dan tombol salin selalu ada. Begini tampilan aslinya.</p>
+ <h2 id="t-prev" class="rv">Ngobrol yang terasa <em>rapi</em></h2>
+ <p class="lead rv">Jawaban mengalir sambil diketik, kode berwarna, dan tombol salin selalu ada. Begini tampilan aslinya</p>
  <div class="frame rv" aria-hidden="true" inert>
   <div class="ph"><div class="pt">Jelaskan perbedaan antara let, const…</div>
    <div class="pr"><span class="mb"><i><svg class="ic" aria-hidden="true"><use href="#i-wind"/></svg></i>GPT-OSS 20B<svg class="ic mu"><use href="#i-down"/></svg></span><span class="mo"><svg class="ic"><use href="#i-moon"/></svg></span></div></div>
@@ -355,8 +346,8 @@ nama = <span class="s">"Lain"</span>;     <span class="c">// TypeError</span></p
 
 <section aria-labelledby="t-fit"><div class="wrap">
  <div class="eb rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-zap"/></svg></span><span class="lb">Fitur</span></div>
- <h2 id="t-fit" class="rv">Semua yang kamu butuhkan, <em>tanpa ribet</em>.</h2>
- <p class="lead rv">Dirancang supaya cepat dipakai dan nyaman dibaca.</p>
+ <h2 id="t-fit" class="rv">Semua yang kamu butuhkan, <em>tanpa ribet</em></h2>
+ <p class="lead rv">Dirancang supaya cepat dipakai dan nyaman dibaca</p>
  <div class="grid g3 body">
   <div class="card fc rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-chip"/></svg></span><h3>Banyak model, satu tempat</h3><p><span data-k="prov">10</span> penyedia AI dan puluhan model dalam satu menu. Kalau satu provider sedang sibuk atau down, ganti saja ke yang lain.</p></div>
   <div class="card fc rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-zap"/></svg></span><h3>Jawaban mengalir</h3><p>Jawaban dibaca bertahap lewat SSE, jadi muncul sambil diketik tanpa menunggu sampai selesai.</p></div>
@@ -372,15 +363,15 @@ nama = <span class="s">"Lain"</span>;     <span class="c">// TypeError</span></p
 
 <section class="alt" aria-labelledby="t-ex"><div class="wrap">
  <div class="eb rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-pencil"/></svg></span><span class="lb">Contoh pertanyaan</span></div>
- <h2 id="t-ex" class="rv">Coba tanyakan <em>apa saja</em>.</h2>
- <p class="lead rv">Beberapa ide untuk memulai.</p>
+ <h2 id="t-ex" class="rv">Coba tanyakan <em>apa saja</em></h2>
+ <p class="lead rv">Beberapa ide untuk memulai</p>
  <div class="grid ex body" id="ex"></div>
 </div></section>
 
 <section aria-labelledby="t-how"><div class="wrap">
  <div class="eb rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-book"/></svg></span><span class="lb">Cara pakai</span></div>
- <h2 id="t-how" class="rv">Delapan langkah, <em>langsung bisa</em>.</h2>
- <p class="lead rv">Begini cara memakai Elara setelah kamu masuk.</p>
+ <h2 id="t-how" class="rv">Delapan langkah, <em>langsung bisa</em></h2>
+ <p class="lead rv">Begini cara memakai Elara setelah kamu masuk</p>
  <ol class="steps c2 body rv">
   <li><strong>Pilih model.</strong> Klik tombol model di kanan atas, lalu pilih provider dan model.</li>
   <li><strong>Ketik pertanyaan</strong> di kolom bawah. <code>Enter</code> untuk kirim, <code>Shift+Enter</code> untuk baris baru.</li>
@@ -395,7 +386,7 @@ nama = <span class="s">"Lain"</span>;     <span class="c">// TypeError</span></p
 
 <section class="alt" aria-labelledby="t-cost"><div class="wrap">
  <div class="eb rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-wallet"/></svg></span><span class="lb">Biaya dan kuota</span></div>
- <h2 id="t-cost" class="rv">Gratis untuk kamu. <em>Tanpa iklan.</em></h2>
+ <h2 id="t-cost" class="rv">Gratis untuk kamu. <em>Tanpa iklan</em></h2>
  <p class="lead rv">Elara gratis untuk pengguna. Tidak ada langganan dan tidak ada iklan. Biayanya ditanggung lewat free tier masing-masing provider:</p>
  <div class="two body">
   <div class="row rv"><b>Groq:</b><span class="d">gratis dengan batas harian.</span></div>
@@ -411,27 +402,27 @@ nama = <span class="s">"Lain"</span>;     <span class="c">// TypeError</span></p
 
 <section aria-labelledby="t-sec"><div class="wrap">
  <div class="eb rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-shield"/></svg></span><span class="lb">Keamanan dan privasi</span></div>
- <h2 id="t-sec" class="rv">Datamu tetap <em>milikmu</em>.</h2>
+ <h2 id="t-sec" class="rv">Datamu tetap <em>milikmu</em></h2>
  <div class="two body">
   <div class="sc rv"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><div><b>API key tidak ada di browser.</b><span>Key disimpan sebagai Secret di Cloudflare Worker, bukan di HTML.</span></div></div>
   <div class="sc rv"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><div><b>Tanpa pelacakan.</b><span>Tidak ada analytics, cookie pihak ketiga, atau telemetri.</span></div></div>
   <div class="sc rv"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><div><b>Data milikmu.</b><span>Riwayat obrolan tersimpan lokal dan bisa kamu hapus kapan saja.</span></div></div>
   <div class="sc rv"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><div><b>Teks di-escape.</b><span>Semua jawaban model diamankan dulu sebelum ditampilkan, supaya tidak ada skrip yang bisa jalan.</span></div></div>
  </div>
- <div class="co warn rv"><strong>Catatan</strong>Elara hanya antarmuka. Jawaban datang dari model AI pihak ketiga dan bisa saja salah. Cek ulang informasi yang penting.</div>
+ <div class="co warn rv"><strong>Catatan</strong>Elara hanya antarmuka. Jawaban datang dari model AI pihak ketiga dan bisa saja salah. Cek ulang informasi yang penting</div>
 </div></section>
 
 <section class="alt" aria-labelledby="t-prov"><div class="wrap">
  <div class="eb rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-plug"/></svg></span><span class="lb">Provider AI</span></div>
- <h2 id="t-prov" class="rv"><span data-k="prov">10</span> penyedia AI, <em>satu tempat</em>.</h2>
- <p class="lead rv">Elara bisa memakai <span data-k="prov">10</span> penyedia AI. Tinggal pilih dari menu model. Kalau satu provider sedang sibuk atau down, ganti saja ke yang lain.</p>
+ <h2 id="t-prov" class="rv"><span data-k="prov">10</span> penyedia AI, <em>satu tempat</em></h2>
+ <p class="lead rv">Elara bisa memakai <span data-k="prov">10</span> penyedia AI. Tinggal pilih dari menu model. Kalau satu provider sedang sibuk atau down, ganti saja ke yang lain</p>
  <div class="grid pg body" id="prov"></div>
 </div></section>
 
 <section aria-labelledby="t-mdl"><div class="wrap">
  <div class="eb rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-cpu"/></svg></span><span class="lb">Model yang tersedia</span></div>
- <h2 id="t-mdl" class="rv">Pilih model <em>sesuai kebutuhan</em>.</h2>
- <p class="lead rv">Tag Fast, Mid, Slow, dan Busy menunjukkan perkiraan kecepatan dan seberapa ramai model tersebut.</p>
+ <h2 id="t-mdl" class="rv">Pilih model <em>sesuai kebutuhan</em></h2>
+ <p class="lead rv">Tag Fast, Mid, Slow, dan Busy menunjukkan perkiraan kecepatan dan seberapa ramai model tersebut</p>
  <div class="leg rv" aria-hidden="true">
   <div><span class="sp">Fast</span>cepat</div><div><span class="sp mid">Mid</span>sedang</div><div><span class="sp slow">Slow</span>lebih lambat</div><div><span class="sp busy">Busy</span>sering ramai atau antre</div><div><span class="vs">Vision</span>bisa membaca gambar</div>
  </div>
@@ -440,8 +431,8 @@ nama = <span class="s">"Lain"</span>;     <span class="c">// TypeError</span></p
 
 <section class="alt" aria-labelledby="t-tech"><div class="wrap">
  <div class="eb rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-layers"/></svg></span><span class="lb">Teknologi</span></div>
- <h2 id="t-tech" class="rv">Ringan di luar, <em>rapi di dalam</em>.</h2>
- <p class="lead rv">Elara berupa satu file HTML. Tampilan, logika, dan pengelolaan data ada di file yang sama. Tidak perlu bundler atau <code>npm install</code>, cukup buka di browser.</p>
+ <h2 id="t-tech" class="rv">Ringan di luar, <em>rapi di dalam</em></h2>
+ <p class="lead rv">Elara berupa satu file HTML. Tampilan, logika, dan pengelolaan data ada di file yang sama. Tidak perlu bundler atau <code>npm install</code>, cukup buka di browser</p>
  <ul class="lst body rv">
   <li><strong>Frontend:</strong> HTML, CSS, dan JavaScript biasa tanpa framework.</li>
   <li><strong>Proxy:</strong> Cloudflare Workers, sebagai perantara antara browser dan penyedia AI.</li>
@@ -456,24 +447,24 @@ nama = <span class="s">"Lain"</span>;     <span class="c">// TypeError</span></p
   <div class="fa"><svg class="ic"><use href="#i-arrow"/></svg></div>
   <div class="fb"><b>Penyedia AI</b></div>
  </div>
- <div class="co rv"><strong>Kenapa pakai Cloudflare Worker?</strong>Supaya API key tidak ada di browser. Browser hanya bicara ke Worker, lalu Worker menambahkan key dan meneruskan permintaan ke provider. Cara ini juga menghindari masalah CORS.</div>
+ <div class="co rv"><strong>Kenapa pakai Cloudflare Worker?</strong>Supaya API key tidak ada di browser. Browser hanya bicara ke Worker, lalu Worker menambahkan key dan meneruskan permintaan ke provider. Cara ini juga menghindari masalah CORS</div>
 </div></section>
 
 <section aria-labelledby="t-me"><div class="wrap">
  <div class="eb rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-user"/></svg></span><span class="lb">Pencipta</span></div>
- <h2 id="t-me" class="rv">Dikerjakan sendiri dalam <em>2 sampai 3 hari</em>.</h2>
+ <h2 id="t-me" class="rv">Dikerjakan sendiri dalam <em>1 minggu</em></h2>
  <div class="body">
   <div class="bio rv"><span class="av" aria-hidden="true">E</span><div><b>Gilang Armanda Putra</b><div class="sb">Pencipta dan developer</div>
-   <div class="tags"><span class="tg"><svg class="ic"><use href="#i-cal"/></svg>19 tahun</span><span class="tg"><svg class="ic"><use href="#i-grad"/></svg>Lulusan SMK</span><span class="tg"><svg class="ic"><use href="#i-pin2"/></svg>Indonesia</span><span class="tg"><svg class="ic"><use href="#i-zap"/></svg>2 sampai 3 hari</span></div></div></div>
-  <p class="rv">Elara dibuat oleh <strong>Gilang Armanda Putra</strong>, 19 tahun, lulusan SMK. Seluruh sistemnya dikerjakan sendiri dalam 2 sampai 3 hari, mulai dari tampilan, arsitektur, pengaturan banyak model AI, sampai keamanannya.</p>
-  <p class="rv">Tujuannya sederhana: asisten AI yang cepat, bisa diandalkan, dan ringan. Tanpa iklan, tanpa pelacakan, dan gratis untuk pengguna.</p>
+   <div class="tags"><span class="tg"><svg class="ic"><use href="#i-cal"/></svg>19 tahun</span><span class="tg"><svg class="ic"><use href="#i-grad"/></svg>Lulusan SMK</span><span class="tg"><svg class="ic"><use href="#i-pin2"/></svg>Indonesia</span><span class="tg"><svg class="ic"><use href="#i-zap"/></svg>1 minggu</span></div></div></div>
+  <p class="rv">Elara dibuat oleh <strong>Gilang Armanda Putra</strong>, 19 tahun, lulusan SMK. Seluruh sistemnya dikerjakan sendiri dalam 1 minggu, mulai dari tampilan, arsitektur, pengaturan banyak model AI, sampai keamanannya</p>
+  <p class="rv">Tujuannya sederhana: asisten AI yang cepat, bisa diandalkan, dan ringan. Tanpa iklan, tanpa pelacakan, dan gratis untuk pengguna</p>
  </div>
 </div></section>
 
 <section class="alt" aria-labelledby="t-dev"><div class="wrap">
  <div class="eb rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-cloud"/></svg></span><span class="lb">Untuk developer</span></div>
  <h2 id="t-dev" class="rv">Mau hosting <em>sendiri</em>?</h2>
- <p class="lead rv">Mau fork Elara dan hosting sendiri? Ini langkah singkat untuk menyiapkan proxy Cloudflare Worker.</p>
+ <p class="lead rv">Mau fork Elara dan hosting sendiri? Ini langkah singkat untuk menyiapkan proxy Cloudflare Worker</p>
  <ol class="steps body rv">
   <li>Buat akun gratis di dash.cloudflare.com.</li>
   <li>Buka <strong>Workers &amp; Pages</strong>, pilih <strong>Create</strong> lalu <strong>Worker</strong>, dan beri nama misalnya <code>elara-proxy</code>.</li>
@@ -483,12 +474,12 @@ nama = <span class="s">"Lain"</span>;     <span class="c">// TypeError</span></p
   <li>Di file HTML Elara, cari baris <code>const WORKER_BASE = "..."</code> dan ganti dengan URL Worker-mu.</li>
   <li>Buka Elara di browser. Semua panggilan AI sekarang lewat proxy-mu sendiri.</li>
  </ol>
- <div class="co rv"><strong>Saran</strong>Aktifkan rate limiting di Worker (misalnya 30 permintaan per menit per IP) supaya tidak disalahgunakan kalau URL-nya dibagikan.</div>
+ <div class="co rv"><strong>Saran</strong>Aktifkan rate limiting di Worker (misalnya 30 permintaan per menit per IP) supaya tidak disalahgunakan kalau URL-nya dibagikan</div>
 </div></section>
 
 <section aria-labelledby="t-lic"><div class="wrap">
  <div class="eb rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-file"/></svg></span><span class="lb">Lisensi</span></div>
- <h2 id="t-lic" class="rv">Lisensi dan <em>atribusi</em>.</h2>
+ <h2 id="t-lic" class="rv">Lisensi dan <em>atribusi</em></h2>
  <p class="lead rv">Elara memakai beberapa komponen open-source. Berikut daftar dan lisensinya:</p>
  <div class="body">
   <div class="lic rv"><span class="bd">MIT</span><b>Elara (kode aplikasi)</b><i>© Gilang Armanda Putra</i></div>
@@ -502,7 +493,7 @@ nama = <span class="s">"Lain"</span>;     <span class="c">// TypeError</span></p
 
 <section class="alt" aria-labelledby="t-thx"><div class="wrap">
  <div class="eb rv"><span class="em"><svg class="ic" aria-hidden="true"><use href="#i-heart"/></svg></span><span class="lb">Terima kasih</span></div>
- <h2 id="t-thx" class="rv">Terima <em>kasih</em>.</h2>
+ <h2 id="t-thx" class="rv">Terima <em>kasih</em></h2>
  <p class="lead rv">Terima kasih untuk:</p>
  <ul class="lst body rv">
   <li><strong>Cloudflare</strong> yang menyediakan proxy gratis.</li>
@@ -584,9 +575,6 @@ const CHAT_URL = "chat.html"; // ganti sesuai lokasi aplikasi chat
   var reduce = matchMedia("(prefers-reduced-motion:reduce)").matches;
   var $ = function(s){return document.querySelector(s)};
   var mk = function(tag, cls, txt){var e=document.createElement(tag); if(cls) e.className=cls; if(txt!=null) e.textContent=txt; return e};
-
-  // watermark: isi SPOKES yang sama dengan logo
-  $("#wmg").innerHTML = SPOKES;
 
   // angka dari data
   var provs = [], groups = {}, vis = 0;
